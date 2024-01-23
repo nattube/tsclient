@@ -23,6 +23,12 @@ impl<T: TypescriptType> Buildable for Query<T> {
     }
 }
 
+impl<T: TypescriptType> Buildable for axum_extra::extract::Query<T> {
+    fn build(registry: &mut GlobalTypeRegistry, _pos: Postion) -> Option<RouteComponentType> {
+        return Some(RouteComponentType::Query(T::get_definition(registry)))
+    }
+}
+
 impl<T: TypescriptType> Buildable for Json<T> {
     fn build(registry: &mut GlobalTypeRegistry, pos: Postion) -> Option<RouteComponentType> {
         return Some(RouteComponentType::Json(pos, T::get_definition(registry)))
