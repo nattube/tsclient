@@ -28,7 +28,7 @@ pub fn ts_strict(item: TokenStream,) -> proc_macro::TokenStream {
 
     let holder = parse_quote!(::tsclient::types::TypeHolderStrict);
 
-    ts_internal(input.data, input.ident, input.attrs, holder)
+    ts_internal(input.data, input.generics, input.ident, input.attrs, holder)
 }
 
 #[proc_macro_error]
@@ -38,10 +38,10 @@ pub fn ts(item: TokenStream,) -> proc_macro::TokenStream {
 
     let holder = parse_quote!(::tsclient::types::TypeHolder);
 
-    ts_internal(input.data, input.ident, input.attrs, holder)
+    ts_internal(input.data, input.generics, input.ident, input.attrs, holder)
 }
 
-fn ts_internal(parse: syn::Data, ident: syn::Ident, attrs: Vec<Attribute>, holder: syn::Path) -> TokenStream {
+fn ts_internal(parse: syn::Data, generics: syn::Generics, ident: syn::Ident, attrs: Vec<Attribute>, holder: syn::Path) -> TokenStream {
     let mut hashes = Vec::new();
 
     let serde_att = attrs
@@ -81,12 +81,14 @@ fn ts_internal(parse: syn::Data, ident: syn::Ident, attrs: Vec<Attribute>, holde
     };
 
     let id_name = ident.to_string();
+
+    let gen_inner = generics.params.iter();
     
     let output = quote! {
 
-        impl ::tsclient::types::TypescriptType for #ident {
+        impl <#(#gen_inner: ::tsclient::types::TypescriptType + 'static,)*> ::tsclient::types::TypescriptType for #ident #generics {
             fn get_definition(registry: &mut ::tsclient::types::builder::GlobalTypeRegistry) -> ::tsclient::types::builder::HasIndexed {
-                let type_id = ::std::any::TypeId::of::<#ident>();
+                let type_id = ::std::any::TypeId::of::<Self>();
                 if let Some(existing) = registry.return_existing(type_id) {
                     return existing
                 }
@@ -110,7 +112,7 @@ fn ts_internal(parse: syn::Data, ident: syn::Ident, attrs: Vec<Attribute>, holde
                 String::from(#id_name)
             }
             fn hash(registry: &mut ::tsclient::types::builder::GlobalTypeRegistry) -> ::std::primitive::u64 {
-                let type_id = ::std::any::TypeId::of::<#ident>();
+                let type_id = ::std::any::TypeId::of::<Self>();
 
                 if let Some(h) = registry.start_hash(type_id) {
                     return h
