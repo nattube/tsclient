@@ -126,6 +126,8 @@ impl<T: TypescriptType + 'static> TypescriptType for Option<T> {
 ts_simple!(String, "String", "string");
 ts_simple!(&str, "&str", "string");
 
+ts_simple!((), "()", "null");
+
 ts_simple!(bool, "bool", "boolean");
 
 ts_simple!(u8, "u8", "number");
