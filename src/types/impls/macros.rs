@@ -17,6 +17,78 @@ macro_rules! ts_simple {
     }
 }
 
+macro_rules! ts_tuple {
+    ($($typ:ident),+) => { 
+        impl<$($typ : TypescriptType + 'static),+> TypescriptType for ($($typ),+) {
+            fn get_definition(registry: &mut GlobalTypeRegistry) -> HasIndexed {
+                let type_id = TypeId::of::<Self>();
+                if let Some(existing) = registry.return_existing(type_id) {
+                    return existing
+                }
+            
+                registry.start(type_id);
+            
+                let mut subs = Vec::new();
+
+                $(
+                    subs.push(ComponentReference {
+                        id: $typ::get_definition(registry),
+                        renamed: None,
+                    });
+                )+
+            
+                let hash = Self::hash(registry); 
+            
+                let component = Component {
+                    name: format!("Tuple"),
+                    typ: Type::Struct(
+                        InnerType::Tuple(subs)
+                    ),
+                    hash
+                };
+            
+                return registry.finalize(type_id, component)
+            }
+            fn name() -> String {
+                let mut names = Vec::new();
+                $(
+                    names.push($typ::name());
+                )+
+
+                format!("({})", names.join(", "))
+            }
+            fn ts_name() -> String {
+                let mut names = Vec::new();
+                $(
+                    names.push($typ::ts_name());
+                )+
+                format!("[{}]", names.join(", "))
+            }
+            fn hash(registry: &mut GlobalTypeRegistry) -> u64 {
+                let type_id = ::std::any::TypeId::of::<Self>();
+
+                if let Some(h) = registry.start_hash(type_id) {
+                    return h
+                }
+            
+                let mut hasher = DefaultHasher::new();
+                "tuple".hash(&mut hasher);
+                Self::name().hash(&mut hasher);
+
+                $(
+                    $typ::hash(registry).hash(&mut hasher);
+                )+
+            
+                let hash = hasher.finish();
+            
+                registry.finalize_hash(type_id, hash);
+            
+                return hash;
+            }
+        }
+    }
+}
+
 macro_rules! ts_array_base {
     ($typ:ty, $ts_typ:expr, $typ_name:expr) => {
         fn get_definition(registry: &mut GlobalTypeRegistry) -> HasIndexed {

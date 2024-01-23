@@ -5,8 +5,8 @@
 */
 
 import { Test } from "../../../../dto/Test";
-import { Result1 } from "../../../../dto/Result1";
 import __client__, {type ApiResult} from "../../../client"
+import { Result1 } from "../../../../dto/Result1";
 import { Test3 } from "../../../../dto/Test3";
 
  

@@ -3,7 +3,7 @@ use std::{any::TypeId, hash::{DefaultHasher, Hash as _, Hasher as _}};
 
 use crate::types::{builder::{GlobalTypeRegistry, HasIndexed}, TypescriptType, model::{ComponentReference, Component, Type, EnumRepresentation, InnerType}};
 
-use super::{boilerplate_simple_definition, boilerplate_simple_hash, ts_simple, ts_array};
+use super::{boilerplate_simple_definition, boilerplate_simple_hash, ts_simple, ts_array, ts_tuple};
 
 impl<T: TypescriptType + 'static, E: TypescriptType + 'static> TypescriptType for Result<T, E> {
     fn get_definition(registry: &mut GlobalTypeRegistry) -> HasIndexed {
@@ -126,6 +126,8 @@ impl<T: TypescriptType + 'static> TypescriptType for Option<T> {
 ts_simple!(String, "String", "string");
 ts_simple!(&str, "&str", "string");
 
+ts_simple!(bool, "bool", "boolean");
+
 ts_simple!(u8, "u8", "number");
 ts_simple!(u16, "u16", "number");
 ts_simple!(u32, "u32", "number");
@@ -142,3 +144,10 @@ ts_simple!(f64, "f64", "number");
 ts_array!(Vec<T>, "Vec<", ">");
 ts_array!([T; C], "[", "]", C);
 ts_array!(&[T], "[", "]");
+
+ts_tuple!(T1, T2);
+ts_tuple!(T1, T2, T3);
+ts_tuple!(T1, T2, T3, T4);
+ts_tuple!(T1, T2, T3, T4, T5);
+ts_tuple!(T1, T2, T3, T4, T5, T6);
+ts_tuple!(T1, T2, T3, T4, T5, T6, T7);

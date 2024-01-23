@@ -4,8 +4,8 @@
  * WARNING: Changes you perform here will probably not persist!
 */
 
+import { getTest, postTest } from "./test";
 import { createNested } from "./test/deep/and/nested";
-import { postTest, getTest } from "./test";
 
 class Client {
     BASE_PATH = "";

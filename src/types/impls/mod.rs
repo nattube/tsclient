@@ -5,6 +5,7 @@ use super::{TypescriptType, builder::{GlobalTypeRegistry, HasIndexed}, model::{C
 pub mod std;
 pub mod chrono;
 pub mod router;
+pub mod json;
 
 #[macro_use]
 pub mod macros;
@@ -12,6 +13,7 @@ pub mod macros;
 pub(crate) use ts_simple;
 pub(crate) use ts_array;
 pub(crate) use ts_array_base;
+pub(crate) use ts_tuple;
 
 pub fn boilerplate_simple_definition<T: TypescriptType + 'static>(typ: Type, registry: &mut GlobalTypeRegistry) -> HasIndexed {
     let type_id = TypeId::of::<T>();
