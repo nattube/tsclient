@@ -65,7 +65,63 @@ impl<T: TypescriptType + 'static, E: TypescriptType + 'static> TypescriptType fo
     fn ts_name() -> String {
         String::from("Result")
     }
-} 
+}
+
+impl<T: TypescriptType + 'static> TypescriptType for Option<T> {
+    fn get_definition(registry: &mut GlobalTypeRegistry) -> HasIndexed {
+        let type_id = TypeId::of::<Self>();
+        if let Some(existing) = registry.return_existing(type_id) {
+            return existing
+        }
+
+        registry.start(type_id);
+
+        let some = ComponentReference {
+            id: T::get_definition(registry),
+            renamed: None,
+        };
+
+        let hash = Self::hash(registry); 
+
+        let component = Component {
+            name: format!("Option"),
+            typ: Type::Enum(
+                EnumRepresentation::Default, 
+                vec![(String::from("Ok"), InnerType::NewType(some)), (String::from("None"), InnerType::Null)]
+            ),
+            hash
+        };
+
+        return registry.finalize(type_id, component)
+    }
+
+    fn hash(registry: &mut GlobalTypeRegistry) -> u64 {
+        let type_id = ::std::any::TypeId::of::<Self>();
+
+        if let Some(h) = registry.start_hash(type_id) {
+            return h
+        }
+
+        let mut hasher = DefaultHasher::new();
+        "enum".hash(&mut hasher);
+        Self::name().hash(&mut hasher);
+        T::hash(registry).hash(&mut hasher);
+
+        let hash = hasher.finish();
+
+        registry.finalize_hash(type_id, hash);
+
+        return hash;
+    }
+
+    fn name() -> String {
+       String::from("Option")
+    }
+
+    fn ts_name() -> String {
+        T::name() + " | null"
+    }
+}
 
 ts_simple!(String, "String", "string");
 ts_simple!(&str, "&str", "string");

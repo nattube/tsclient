@@ -4,6 +4,7 @@ use super::{TypescriptType, builder::{GlobalTypeRegistry, HasIndexed}, model::{C
 
 pub mod std;
 pub mod chrono;
+pub mod router;
 
 #[macro_use]
 pub mod macros;
