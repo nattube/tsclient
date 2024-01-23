@@ -30,6 +30,12 @@ impl<T: TypescriptType> Buildable for Json<T> {
 }
 
 
+impl<T: TypescriptType + 'static, R: TypescriptType + 'static> Buildable for Result<T, R> {
+    fn build(registry: &mut GlobalTypeRegistry, pos: Postion) -> Option<RouteComponentType> {
+        return Some(RouteComponentType::Json(pos, Result::<T, R>::get_definition(registry)))
+    }
+}
+
 impl<T: TypescriptType + 'static, R: TypescriptType + 'static> Buildable for Result<Json<T>, R> {
     fn build(registry: &mut GlobalTypeRegistry, pos: Postion) -> Option<RouteComponentType> {
         return Some(RouteComponentType::Json(pos, Result::<T, R>::get_definition(registry)))
@@ -44,6 +50,12 @@ impl<T: TypescriptType + 'static, R: TypescriptType + 'static> Buildable for Res
 
 
 impl<T: TypescriptType + 'static> Buildable for Option<Json<T>> {
+    fn build(registry: &mut GlobalTypeRegistry, pos: Postion) -> Option<RouteComponentType> {
+        return Some(RouteComponentType::Json(pos, Option::<T>::get_definition(registry)))
+    }
+}
+
+impl<T: TypescriptType + 'static> Buildable for Option<T> {
     fn build(registry: &mut GlobalTypeRegistry, pos: Postion) -> Option<RouteComponentType> {
         return Some(RouteComponentType::Json(pos, Option::<T>::get_definition(registry)))
     }
