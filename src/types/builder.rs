@@ -154,7 +154,7 @@ impl GlobalTypeRegistry {
 
     pub fn get_indexed(&self, index: &HasIndexed) -> &Component {
         let idx = match index {
-            HasIndexed::Prebuild(i) => self.type_index.get(i).expect(&format!("Builder error??? Index: {:?}\n\n{:#?}",index, self)),
+            HasIndexed::Prebuild(i) => self.type_index.get(i).expect(&format!("Builder error??? Index: {:?}\n\n{:?}",index, self)),
             HasIndexed::Build(i) => i,
         };
 
