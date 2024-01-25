@@ -3,17 +3,12 @@
  * 
  * WARNING: Changes you perform here will probably not persist!
 */
-import {type Test} from "./Test";
 
 
-export type Ok = {
-	Ok: Test
-}
+export type Ok = any
 
 
-export type Err = {
-	Err: string
-}
+export type None = null
 
 
-export type Result2 = Ok | Err
+export type Option2 = Ok | None

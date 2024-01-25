@@ -5,14 +5,13 @@
 */
 
 import { createNested } from "./test/deep/and/nested";
-import { getTest, postTest } from "./test";
+import { postTest, getTest } from "./test";
 
 class Client {
     BASE_PATH = "";
 
     API = {
 		test: {
-			postTest: postTest,
 			getTest: getTest,
 			deep: {
 				and: {
@@ -20,7 +19,8 @@ class Client {
 						createNested: createNested
 					}
 				}
-			}
+			},
+			postTest: postTest
 		}
 	}
 

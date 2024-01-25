@@ -2,8 +2,11 @@ pub fn add(left: usize, right: usize) -> usize {
     left + right
 }
 
+pub mod testes;
+
 #[cfg(test)]
 mod tests {
+    use axum::Extension;
     use ::axum::{extract::Query, Json};
     use serde::{Serialize, Deserialize};
     use tsclient::TypeScript;
@@ -15,6 +18,8 @@ mod tests {
     use tsclient::types::builder::{GlobalTypeRegistry, TypeBuilder};
     
     pub use tsclient::TypeScriptStrict as TS;
+
+    use self::testes::UserInfo;
 
     use super::*;
 
@@ -67,12 +72,18 @@ mod tests {
         Json(body)
     }
 
-    async fn test_fn3(q: Query<Test>) -> Result<Json<String>, Json<u64>> {
-        Ok(Json(String::from("OK")))
+    async fn test_fn3(Extension(q): Extension<UserInfo>) -> Json<UserInfo> {
+        Json(UserInfo {
+            id: 1,
+            name: String::new(),
+            refresh_pw: false,
+            groups: vec![],
+            security_version: 2,
+        })
     }
 
-    async fn test_fn2(q: Query<Test3>, Json(body): Json<Test>) -> Result<Json<Test>, String> {
-        Ok(Json(body))
+    async fn test_fn2(q: Query<Test3>, Json(body): Json<Test>) -> Result<Json<Vec<Test>>, String> {
+        Ok(Json(vec![body]))
     }
 
     #[test]

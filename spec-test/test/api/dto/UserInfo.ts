@@ -5,14 +5,10 @@
 */
 
 
-export type Ok = {
-	Ok: Array<string>
+export type UserInfo = {
+	id: number;
+	name: string;
+	refresh_pw: boolean;
+	groups: Array<string>;
+	security_version: number
 }
-
-
-export type Err = {
-	Err: string
-}
-
-
-export type Result1 = Ok | Err

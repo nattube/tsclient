@@ -220,6 +220,7 @@ impl GlobalTypeRegistry {
         if let Some(i) = self.type_index.get(&type_id) {
             return HasIndexed::Build(*i);
         } else if let Some(i) = self.hash_index.get(&hash) {
+            self.type_index.insert(type_id, *i);
             return HasIndexed::Build(*i);
         }
 

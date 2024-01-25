@@ -4,10 +4,10 @@
  * WARNING: Changes you perform here will probably not persist!
 */
 
-import { type Test } from "../../../../dto/Test";
-import { type Result2 } from "../../../../dto/Result2";
-import __client__, {type ApiResult} from "../../../client"
 import { type Test3 } from "../../../../dto/Test3";
+import __client__, {type ApiResult} from "../../../client"
+import { type Test } from "../../../../dto/Test";
+import { type Result1 } from "../../../../dto/Result1";
 
  
 export async function createNested_RAW(test3: Test3, test: Test): Promise<Response> {
@@ -39,7 +39,7 @@ export async function createNested_RAW(test3: Test3, test: Test): Promise<Respon
 
 
 
-export async function createNested(test3: Test3, test: Test): Promise<ApiResult<Test, string>> {
+export async function createNested(test3: Test3, test: Test): Promise<ApiResult<Array<string>, string>> {
     let __result = await createNested_RAW(test3, test);
 
     if(!__result.ok) {
