@@ -197,7 +197,7 @@ const client = new Client();
 
 export default client;
 
-export type ApiResult<T, E> = T | {{isError: true, status_code: number,  error: E}};
+export type ApiResult<T, E> = {{isError: false, ok: T}} | {{isError: true, status_code: number,  error: E}};
         "#, client_builder.get_ts_imports(), client_builder.obj.to_ts("\t".to_string()));
 
         fs::write(api_path.join("client.ts"), client)?;
@@ -424,7 +424,11 @@ export async function {method_base_name}({inputs}): {result} {{
             error
         }}
     }} else {{
-        return await __result.json()
+        let ok = await __result.json();
+        return {{
+            isError: false,
+            ok
+        }}
     }}
 }}
 "#, 
