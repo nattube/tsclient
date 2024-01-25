@@ -358,8 +358,8 @@ impl Route {
                 }
             }
 
-            let method_base_name = method.name.clone()
-                .unwrap_or(format!("{}{}", http.to_name(), capitalize_first_letter(name.strip_suffix(".ts").unwrap_or(name))));
+            let method_base_name = clean_var_name( &method.name.clone()
+                .unwrap_or(format!("{}{}", http.to_name(), capitalize_first_letter(name.strip_suffix(".ts").unwrap_or(name)))));
 
             client_builder.add(segments.clone(), &method_base_name);
 
