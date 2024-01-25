@@ -130,18 +130,21 @@ impl InnerType {
                 for (field, refr) in fields {
                     let sub_comp = registry.get_indexed(&refr.id);
 
-                    if let Some(import) = sub_comp.build(builder, registry) {
+                    let renamed_comp = if let Some(import) = sub_comp.build(builder, registry) {
                         let (name,_) = builder.get_type_and_import(&import, sub_comp.hash, 0);
-                        imports.insert(name.clone(), (name, refr.renamed.clone()));
-                    }
+                        imports.insert(name.clone(), (name.clone(), refr.renamed.clone()));
+                        refr.renamed.clone().or(Some(name))
+                    } else {
+                        refr.renamed.clone()
+                    };
 
-                    update_declarations(declarations, sub_comp, &refr.renamed, registry);
+                    update_declarations(declarations, sub_comp, &renamed_comp, registry);
 
                     if !result.ends_with('{') {
                         result += &format!(";");
                     }
 
-                    result += &format!("\n\t{}: {}", field, refr.renamed.as_ref().unwrap_or(&sub_comp.get_ts_name(registry)));
+                    result += &format!("\n\t{}: {}", field, renamed_comp.as_ref().unwrap_or(&sub_comp.get_ts_name(registry)));
                 }
 
                 result += "\n}";
@@ -165,10 +168,13 @@ impl InnerType {
                 for refr in refs {
                     let sub_comp = registry.get_indexed(&refr.id);
 
-                    if let Some(import) = sub_comp.build(builder, registry) {
+                    let renamed_comp = if let Some(import) = sub_comp.build(builder, registry) {
                         let (name,_) = builder.get_type_and_import(&import, sub_comp.hash, 0);
-                        imports.insert(name.clone(), (name, refr.renamed.clone()));
-                    }
+                        imports.insert(name.clone(), (name.clone(), refr.renamed.clone()));
+                        refr.renamed.clone().or(Some(name))
+                    } else {
+                        refr.renamed.clone()
+                    };
 
                     update_declarations(declarations, sub_comp, &refr.renamed, registry);
 
@@ -176,7 +182,7 @@ impl InnerType {
                         result += &format!(",");
                     }
 
-                    result += &format!(" {}", refr.renamed.as_ref().unwrap_or(&sub_comp.get_ts_name(registry)));
+                    result += &format!(" {}", renamed_comp.as_ref().unwrap_or(&sub_comp.get_ts_name(registry)));
                 }
                 result += "]";
 
@@ -197,15 +203,19 @@ impl InnerType {
 
                 let sub_comp = registry.get_indexed(&refr.id);
 
-                if let Some(import) = sub_comp.build(builder, registry) {
+                let renamed_comp = if let Some(import) = sub_comp.build(builder, registry) {
                     let (name,_) = builder.get_type_and_import(&import, sub_comp.hash, 0);
-                    imports.insert(name.clone(), (name, refr.renamed.clone()));
-                }
+                    imports.insert(name.clone(), (name.clone(), refr.renamed.clone()));
+                    refr.renamed.clone().or(Some(name))
+                } else {
+                    refr.renamed.clone()
+                };
+
                 let _alternative = sub_comp.get_ts_name(registry);
 
-                let sub_name = refr.renamed.as_ref().unwrap_or(&_alternative);
+                let sub_name = renamed_comp.as_ref().unwrap_or(&_alternative);
 
-                update_declarations(declarations, sub_comp, &refr.renamed, registry);
+                update_declarations(declarations, sub_comp, &renamed_comp, registry);
 
                 let result = match repr {
                     Some((EnumRepresentation::Adjacently(tag, var), typ)) => {

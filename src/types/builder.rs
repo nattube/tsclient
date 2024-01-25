@@ -1,4 +1,4 @@
-use std::{collections::HashMap, any::TypeId, sync::Mutex, path::PathBuf, error::Error, fs};
+use std::{collections::{HashMap, HashSet}, any::TypeId, sync::Mutex, path::PathBuf, error::Error, fs};
 
 use crate::FILE_HEADER;
 
@@ -237,7 +237,7 @@ pub struct ComponentFileBuilder {
     pub name: String,
     pub hash: u64,
     pub imports: Vec<(String, Option<String>)>,
-    pub type_defs: Vec<String>,
+    pub type_defs: HashSet<String>,
     pub content: String,
     pub exports: Vec<String>
 }
@@ -248,7 +248,7 @@ impl ComponentFileBuilder {
             name,
             hash,
             imports: Vec::new(),
-            type_defs: Vec::new(),
+            type_defs: HashSet::new(),
             content: String::new(),
             exports: Vec::new(),
         }
