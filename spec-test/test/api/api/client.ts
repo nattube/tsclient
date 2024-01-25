@@ -4,23 +4,23 @@
  * WARNING: Changes you perform here will probably not persist!
 */
 
-import { getTest, postTest } from "./test";
 import { createNested } from "./test/deep/and/nested";
+import { getTest, postTest } from "./test";
 
 class Client {
     BASE_PATH = "";
 
     API = {
 		test: {
+			postTest: postTest,
+			getTest: getTest,
 			deep: {
 				and: {
 					nested: {
 						createNested: createNested
 					}
 				}
-			},
-			postTest: postTest,
-			getTest: getTest
+			}
 		}
 	}
 

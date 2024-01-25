@@ -6,12 +6,12 @@
 
 
 export type Ok = {
-	Ok: string
+	Ok: number
 }
 
 
 export type Err = {
-	Err: number
+	Err: string
 }
 
 

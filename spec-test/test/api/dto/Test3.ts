@@ -3,10 +3,13 @@
  * 
  * WARNING: Changes you perform here will probably not persist!
 */
+import {type Option} from "./Option";
+import {type Option1} from "./Option1";
 
-type LocactionId = number;
 
 export type Test3 = {
 	field1: Array<string>;
-	field2: LocactionId
+	field2: Option;
+	field3: Option;
+	field4: Option
 }

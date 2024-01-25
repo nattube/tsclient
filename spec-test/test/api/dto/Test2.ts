@@ -3,9 +3,10 @@
  * 
  * WARNING: Changes you perform here will probably not persist!
 */
+import {type Result as Result} from "./Result";
 
 
 export type Test2 = {
-	field1: number;
+	field1: Result;
 	field2: number
 }

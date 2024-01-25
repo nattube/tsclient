@@ -5,14 +5,10 @@
 */
 
 
-export type Ok = {
-	Ok: string
-}
+export type Ok = number
 
 
-export type Err = {
-	Err: number
-}
+export type None = null
 
 
-export type Result1 = Ok | Err
+export type Option = Ok | None

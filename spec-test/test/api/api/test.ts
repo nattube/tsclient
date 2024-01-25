@@ -4,10 +4,10 @@
  * WARNING: Changes you perform here will probably not persist!
 */
 
+import { type Test } from "../dto/Test";
 import __client__, {type ApiResult} from "./client"
-import { Test } from "../dto/Test";
-import { Result } from "../dto/Result";
-import { Test3 } from "../dto/Test3";
+import { type Result1 } from "../dto/Result1";
+import { type Test3 } from "../dto/Test3";
 
  
 export async function getTest_RAW(test: Test): Promise<Response> {
@@ -20,8 +20,8 @@ export async function getTest_RAW(test: Test): Promise<Response> {
     
     const __params = new URLSearchParams();
 
-	test.field1.forEach(val => __params.append('field1', val.toString()));
-	test.field2.forEach(val => __params.append('field2', val.toString()));
+	if(test.field1 != null) { test.field1.forEach(val => __params.append('field1', val.toString())); }
+	if(test.field2 != null) { test.field2.forEach(val => __params.append('field2', val.toString())); }
 
     const __queryString = "?" + __params.toString();
 
@@ -64,8 +64,10 @@ export async function postTest_RAW(test3: Test3, test: Test): Promise<Response> 
     
     const __params = new URLSearchParams();
 
-	test3.field1.forEach(val => __params.append('field1', val.toString()));
-	__params.append('field2', test3.field2.toString())
+	if(test3.field1 != null) { test3.field1.forEach(val => __params.append('field1', val.toString())); }
+	if(test3.field2 != null) { __params.append('field2', test3.field2.toString()) }
+	if(test3.field3 != null) { __params.append('field3', test3.field3.toString()) }
+	if(test3.field4 != null) { __params.append('field4', test3.field4.toString()) }
 
     const __queryString = "?" + __params.toString();
 

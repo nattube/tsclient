@@ -35,7 +35,7 @@ mod tests {
     
     #[derive(Serialize, Deserialize, TypeScript)]
     pub struct Test2 {
-        field1: u64,
+        field1: Result<u64, String>,
         field2: u64
     }
 
@@ -48,7 +48,9 @@ mod tests {
     #[derive(Serialize, Deserialize, TypeScript)]
     pub struct Test3 {
         field1: Vec<String>,
-        field2: LocactionId
+        field2: Option<LocactionId>,
+        field3: Option<LocactionId>,
+        field4: Option<Test>,
     }
 
     type LocactionId = u64;
@@ -104,5 +106,18 @@ mod tests {
             .route("/api/test/deep/and/nested", post(test_fn2).rename_ts([(HTTPMethod::POST, "createNested")]));
 
         api.api.export_to(&std::path::PathBuf::from("test/api"), Some("/api")).unwrap();
+
+        println!();
+        let t7: Test3 = Test3 {
+            field1: vec![String::from("String 1")],
+            field2: None,
+            field3: Some(1),
+            field4: Some(Test {
+                field1: vec![String::from("String 2")],
+                field2: vec![Test2 { field1: Ok(2), field2: 3 }, Test2 { field1: Err(String::from("erorr string")), field2: 3 }],
+            }),
+        };
+
+        println!("{}", serde_json::to_string_pretty(&t7).unwrap())
     }
 }

@@ -1,4 +1,4 @@
-use std::hash::{DefaultHasher, Hasher as _, Hash as _};
+use std::{hash::{DefaultHasher, Hasher as _, Hash as _}, collections::HashMap};
 
 use super::builder::{HasIndexed, TypeBuilder, GlobalTypeRegistry};
 
@@ -95,15 +95,19 @@ pub enum InnerType {
     Null
 }
 
-fn update_declarations(declarations: &mut Vec::<String>, subcomponent: &Component, renamed: &Option<String>, registry: &GlobalTypeRegistry) {
-    if(renamed.is_some()) {
+fn update_declarations(declarations: &mut HashMap<String, String>, subcomponent: &Component, renamed: &Option<String>, registry: &GlobalTypeRegistry) {
+    if renamed.is_some() {
         let new_name = renamed.as_ref().unwrap();
+        if declarations.contains_key(new_name) {
+            return
+        };
+
         match subcomponent.typ {
             Type::Array(_) |     
             Type::SimpleType(_) |
             Type::Any |
             Type::None => {
-                declarations.push(format!("type {} = {};", new_name, subcomponent.get_ts_name(registry)))
+                declarations.insert(new_name.to_owned(), format!("type {} = {};", new_name, subcomponent.get_ts_name(registry)));
             },
 
             Type::Struct(_) |
@@ -113,11 +117,11 @@ fn update_declarations(declarations: &mut Vec::<String>, subcomponent: &Componen
 }
 
 impl InnerType {
-    pub fn build(&self, builder: &mut TypeBuilder, registry: &GlobalTypeRegistry, declarations: &mut Vec::<String>, repr: Option<(EnumRepresentation, &str)>) -> (String, Vec<(String, Option<String>)>) {
+    pub fn build(&self, builder: &mut TypeBuilder, registry: &GlobalTypeRegistry, declarations: &mut HashMap<String, String>, repr: Option<(EnumRepresentation, &str)>) -> (String, HashMap<String,(String, Option<String>)>) {
         let (content, imports) = match self {
             InnerType::Object(fields) => {
                 let mut result = String::from("{");
-                let mut imports = Vec::new();
+                let mut imports = HashMap::new();
 
                 if let Some((EnumRepresentation::Internally(tag), typ)) = &repr {
                     result += &format!("\n\t{}: {}", tag, typ);
@@ -127,7 +131,8 @@ impl InnerType {
                     let sub_comp = registry.get_indexed(&refr.id);
 
                     if let Some(import) = sub_comp.build(builder, registry) {
-                        imports.push((import, refr.renamed.clone()));
+                        let (name,_) = builder.get_type_and_import(&import, sub_comp.hash, 0);
+                        imports.insert(name.clone(), (name, refr.renamed.clone()));
                     }
 
                     update_declarations(declarations, sub_comp, &refr.renamed, registry);
@@ -155,13 +160,14 @@ impl InnerType {
             }
             InnerType::Tuple(refs) => {
                 let mut result = String::from("[");
-                let mut imports = Vec::new();
+                let mut imports = HashMap::new();
 
                 for refr in refs {
                     let sub_comp = registry.get_indexed(&refr.id);
 
                     if let Some(import) = sub_comp.build(builder, registry) {
-                        imports.push((import, refr.renamed.clone()));
+                        let (name,_) = builder.get_type_and_import(&import, sub_comp.hash, 0);
+                        imports.insert(name.clone(), (name, refr.renamed.clone()));
                     }
 
                     update_declarations(declarations, sub_comp, &refr.renamed, registry);
@@ -187,12 +193,13 @@ impl InnerType {
                 (result, imports)
             },
             InnerType::NewType(refr) => {
-                let mut imports = Vec::new();
+                let mut imports = HashMap::new();
 
                 let sub_comp = registry.get_indexed(&refr.id);
 
                 if let Some(import) = sub_comp.build(builder, registry) {
-                    imports.push((import, refr.renamed.clone()));
+                    let (name,_) = builder.get_type_and_import(&import, sub_comp.hash, 0);
+                    imports.insert(name.clone(), (name, refr.renamed.clone()));
                 }
                 let _alternative = sub_comp.get_ts_name(registry);
 
@@ -212,8 +219,8 @@ impl InnerType {
 
                 return (result, imports)
             },
-            InnerType::SimpleVariant(x) => (format!(r#""{}""#, x), Vec::new()),
-            InnerType::Null => (String::from("null"), Vec::new()),
+            InnerType::SimpleVariant(x) => (format!(r#""{}""#, x), HashMap::new()),
+            InnerType::Null => (String::from("null"), HashMap::new()),
         };
 
         return (content, imports)
@@ -225,7 +232,7 @@ impl InnerType {
             InnerType::Tuple(_) => "type",
             InnerType::NewType(_) => "type",
             InnerType::SimpleVariant(_) => "type",
-            InnerType::Null => "",
+            InnerType::Null => "type",
         }
     }
 }
@@ -244,8 +251,8 @@ impl Type {
 
     fn build_inner_query_string(&self, main_name: &str, field_name: &str) -> String {
         match self {
-            Type::Array(_) => format!("\t{}{}.forEach(val => __params.append('{}', val.toString()));", main_name, field_name, field_name.replace(".", "").replace("[", "").replace("]", "")),
-            _ => format!("\t__params.append('{}', {}{}.toString())", field_name.replace(".", "").replace("[", "").replace("]", ""), main_name, field_name),
+            Type::Array(_) => format!("\tif({}{} != null) {{ {}{}.forEach(val => __params.append('{}', val.toString())); }}", main_name, field_name, main_name, field_name, field_name.replace(".", "").replace("[", "").replace("]", "")),
+            _ => format!("\tif({}{} != null) {{ __params.append('{}', {}{}.toString()) }}", main_name, field_name, field_name.replace(".", "").replace("[", "").replace("]", ""), main_name, field_name),
         }
     }
 
@@ -296,17 +303,17 @@ impl Type {
 
                 file.content += &format!("\n\nexport {} {} {}", decl, name, ending);
 
-                let mut type_declarations = Vec::new();
+                let mut type_declarations = HashMap::new();
 
                 let (content, imports) = fields.build(builder, registry, &mut type_declarations, None);
                 file.content += &content;
 
                 if type_declarations.len() > 0 {
-                    file.type_defs.extend(type_declarations);
+                    file.type_defs.extend(type_declarations.values().map(&String::to_owned));
                 }
 
                 if imports.len() > 0 {
-                    file.imports.extend(imports);
+                    file.imports.extend(imports.into_values());
                 }
 
                 file.exports.push(name.to_string());
@@ -339,7 +346,7 @@ impl Type {
 
                     file.content += &format!("\n\nexport {} {} {}", decl, variant, ending);
 
-                    let mut type_declarations = Vec::new();
+                    let mut type_declarations = HashMap::new();
 
                     let (content, imports) = content.build(builder, registry, &mut type_declarations, Some((repr.clone(), &variant)));
                     file.content += &content;
@@ -347,11 +354,11 @@ impl Type {
 
 
                     if type_declarations.len() > 0 {
-                        file.type_defs.extend(type_declarations);
+                        file.type_defs.extend(type_declarations.values().map(&String::to_owned));
                     }
 
                     if imports.len() > 0 {
-                        file.imports.extend(imports);
+                        file.imports.extend(imports.into_values());
                     }
 
                     file.exports.push(name.to_string());

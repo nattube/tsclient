@@ -42,7 +42,8 @@ impl TypeBuilder {
                         Some(x) => format!(" as {}", x),
                         None => String::from(""),
                     };
-                    file_content += &format!("import {{{}{}}} from \"./{}\";\n", name, rename, name);
+                    
+                    file_content += &format!("import {{type {}{}}} from \"./{}\";\n", name, rename, name);
                 }
 
                 for def in file_guard.type_defs.iter() {
@@ -100,7 +101,7 @@ impl TypeBuilder {
 
         return match self.file_map.get(name) {
             Some(_) => {
-                (name.to_string(), format!("import {{ {} }} from \"{}/dto/{}\";", name, levels, name))
+                (name.to_string(), format!("import {{ type {} }} from \"{}/dto/{}\";", name, levels, name))
             }
             None => (name.to_string(), String::from(""))
         };

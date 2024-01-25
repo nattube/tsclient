@@ -121,7 +121,7 @@ macro_rules! ts_array {
     };
     ($typ:ty, $typ_start:literal, $typ_end:literal) => { 
         impl<T: TypescriptType + 'static> TypescriptType for $typ {
-            crate::types::impls::ts_array_base![$typ, format!("Array<{}>",T::name()), format!("{}{}{}", $typ_start, T::name(), $typ_end)];
+            crate::types::impls::ts_array_base![$typ, format!("Array<{}>",T::name()), format!("{}{}", $typ_start, $typ_end)];
         }
     }
 }

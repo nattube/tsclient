@@ -3,16 +3,17 @@
  * 
  * WARNING: Changes you perform here will probably not persist!
 */
+import {type Test} from "./Test";
 
 
 export type Ok = {
-	Ok: string
+	Ok: Test
 }
 
 
 export type Err = {
-	Err: number
+	Err: string
 }
 
 
-export type Result1 = Ok | Err
+export type Result2 = Ok | Err

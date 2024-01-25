@@ -59,7 +59,7 @@ impl<T: TypescriptType + 'static, E: TypescriptType + 'static> TypescriptType fo
     }
 
     fn name() -> String {
-       String::from("Result")
+        format!("Option<{},{}>", T::name(), E::name())
     }
 
     fn ts_name() -> String {
@@ -86,7 +86,7 @@ impl<T: TypescriptType + 'static> TypescriptType for Option<T> {
         let component = Component {
             name: format!("Option"),
             typ: Type::Enum(
-                EnumRepresentation::Default, 
+                EnumRepresentation::Untagged, 
                 vec![(String::from("Ok"), InnerType::NewType(some)), (String::from("None"), InnerType::Null)]
             ),
             hash
@@ -115,7 +115,7 @@ impl<T: TypescriptType + 'static> TypescriptType for Option<T> {
     }
 
     fn name() -> String {
-       String::from("Option")
+       format!("Option")
     }
 
     fn ts_name() -> String {
@@ -143,7 +143,7 @@ ts_simple!(i64, "i64", "number");
 ts_simple!(f32, "f32", "number");
 ts_simple!(f64, "f64", "number");
 
-ts_array!(Vec<T>, "Vec<", ">");
+ts_array!(Vec<T>, "Vec", "");
 ts_array!([T; C], "[", "]", C);
 ts_array!(&[T], "[", "]");
 
