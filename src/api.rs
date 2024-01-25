@@ -340,7 +340,8 @@ impl Route {
                     RouteComponentType::Path(_)  |
                     RouteComponentType::Json(Postion::Body, _) |
                     RouteComponentType::Raw(Postion::Body, _) => {
-                        route_inputs_builder.push(format!("{}: {}", clean_name, main_component.get_ts_name(registry)));
+                        let (typ, _) = builder.get_type_and_import(&main_component.name, main_component.hash, level);
+                        route_inputs_builder.push(format!("{}: {}", clean_name, typ));
                         route_inputs_names.push(clean_name.clone());
                     },
                     
