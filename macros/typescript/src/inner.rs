@@ -12,9 +12,9 @@ fn get_easy_name(typ: &syn::Type) -> String {
         .collect()
 }
 
-fn get_type_name_and_rename_check(typ: &syn::Type) -> (String, bool) {
+fn get_type_name_and_rename_check(typ: &syn::Type, generic_names: &[String]) -> (String, bool) {
     match typ {
-        syn::Type::Paren(x) => get_type_name_and_rename_check(&*x.elem),
+        syn::Type::Paren(x) => get_type_name_and_rename_check(&*x.elem, generic_names),
         syn::Type::Path(x) => {
             let name = get_easy_name(typ);
             
@@ -24,19 +24,19 @@ fn get_type_name_and_rename_check(typ: &syn::Type) -> (String, bool) {
                     .map(|x| x.ident.to_string())
                     .unwrap_or(get_easy_name(typ)));*/
 
-            (name, true)
+            (name.clone(), !generic_names.contains(&name))
         },
-        syn::Type::Reference(x) => get_type_name_and_rename_check(&*x.elem),
+        syn::Type::Reference(x) => get_type_name_and_rename_check(&*x.elem, generic_names),
         _ => (String::new(), false),
     }
 }
 
-pub(crate) fn parse_tuple(fields: FieldsUnnamed, holder: syn::Path) -> syn::Block {
+pub(crate) fn parse_tuple(fields: FieldsUnnamed, holder: syn::Path, generic_names: &[String]) -> syn::Block {
     let block = fields.unnamed.iter().enumerate().map(|(i, field)| {
         let ident = format_ident!("d{}", i);
         
         let ty = field.ty.clone();
-        let (field_type_name, check_rename) = get_type_name_and_rename_check(&field.ty);
+        let (field_type_name, check_rename) = get_type_name_and_rename_check(&field.ty, generic_names);
         
         parse_quote![{
             let #ident = (&mut &#holder::<#ty>::new()).get_definition(registry);
@@ -65,9 +65,9 @@ pub(crate) fn parse_tuple(fields: FieldsUnnamed, holder: syn::Path) -> syn::Bloc
     })
 }
 
-pub (crate)fn parse_newtype(field: Field, holder: syn::Path) -> syn::Block {
+pub (crate)fn parse_newtype(field: Field, holder: syn::Path, generic_names: &[String]) -> syn::Block {
     let ty = field.ty.clone();
-    let (field_type_name, check_rename) = get_type_name_and_rename_check(&field.ty);
+    let (field_type_name, check_rename) = get_type_name_and_rename_check(&field.ty, generic_names);
 
     let block = parse_quote!({
         let inner_def = (&mut &#holder::<#ty>::new()).get_definition(registry);
@@ -90,11 +90,11 @@ pub (crate)fn parse_newtype(field: Field, holder: syn::Path) -> syn::Block {
     return block
 }
 
-pub(crate) fn parse_object(fields: FieldsNamed, holder: syn::Path) -> syn::Block {
+pub(crate) fn parse_object(fields: FieldsNamed, holder: syn::Path, generic_names: &[String]) -> syn::Block {
     let block = fields.named.iter().enumerate().map(|(i, field)| {
         let ident = format_ident!("d{}", i);
         let ty = field.ty.clone();
-        let (field_type_name, check_rename) = get_type_name_and_rename_check(&field.ty);
+        let (field_type_name, check_rename) = get_type_name_and_rename_check(&field.ty, generic_names);
         
         let field_name = field.ident.clone().map(|f| syn::Member::Named(f)).expect("Parser error named fields").to_token_stream().to_string();
         parse_quote![{

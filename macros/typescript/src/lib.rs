@@ -65,24 +65,25 @@ fn ts_internal(parse: syn::Data, generics: syn::Generics, ident: syn::Ident, att
         _ => parse_quote!(::tsclient::types::model::EnumRepresentation::Default),
     };
 
+    let gen_inner = generics.params.iter();
+    let generic_names = gen_inner.clone().map(|x| x.to_token_stream().to_string()).collect();
+
     let (ident, typ, hash_lit) = match parse {
         syn::Data::Struct(mut x) => {
             hashes.extend(parse_hash_of_fields(x.fields.clone(), holder.clone()));
-            (ident.clone(), parse_struct(x, holder), "Struct")
+            (ident.clone(), parse_struct(x, holder, generic_names), "Struct")
         },
         syn::Data::Enum(mut x) => {
             for variant in x.variants.iter() {
                 hashes.extend(parse_hash_of_fields(variant.fields.clone(), holder.clone()));
             }
 
-            (ident.clone(),parse_enum(x, holder, repr), "Enum")
+            (ident.clone(),parse_enum(x, holder, repr, generic_names), "Enum")
         },
         _ => abort_call_site!("Only enums and structs can derive. Unions are not supported"),
     };
 
     let id_name = ident.to_string();
-
-    let gen_inner = generics.params.iter();
     
     let output = quote! {
 
@@ -150,18 +151,18 @@ fn parse_hash_of_fields(fields: Fields, holder: syn::Path) -> Vec<syn::Block> {
     return res;
 }
 
-fn parse_enum(item: DataEnum, holder: syn::Path, repr: syn::Expr) -> syn::Block { 
+fn parse_enum(item: DataEnum, holder: syn::Path, repr: syn::Expr, generic_names: Vec<String>) -> syn::Block { 
     let mut blocks: Vec<syn::Block> = Vec::new();
 
     for variant in item.variants {
         let ident = variant.ident.to_string();
 
         let parsed = match variant.fields {
-            syn::Fields::Named(named) => parse_object(named, holder.clone()),
+            syn::Fields::Named(named) => parse_object(named, holder.clone(), &generic_names),
             syn::Fields::Unnamed(unnamed) => match unnamed.unnamed.len() {
                 0 => parse_quote!({::tsclient::types::model::InnerType::SimpleVariant(#ident.to_string())}),
-                1 => parse_newtype(unnamed.unnamed[0].clone(), holder.clone()),
-                _ => parse_tuple(unnamed, holder.clone())
+                1 => parse_newtype(unnamed.unnamed[0].clone(), holder.clone(), &generic_names),
+                _ => parse_tuple(unnamed, holder.clone(), &generic_names)
             },
             syn::Fields::Unit => parse_quote!({::tsclient::types::model::InnerType::SimpleVariant(#ident.to_string())})
         };
@@ -181,13 +182,13 @@ fn parse_enum(item: DataEnum, holder: syn::Path, repr: syn::Expr) -> syn::Block 
     })
 }
 
-fn parse_struct(item: DataStruct, holder: syn::Path) -> syn::Block { 
+fn parse_struct(item: DataStruct, holder: syn::Path, generic_names: Vec<String>) -> syn::Block { 
     let inner_typ = match item.fields {
-        syn::Fields::Named(named) => parse_object(named, holder),
+        syn::Fields::Named(named) => parse_object(named, holder, &generic_names),
         syn::Fields::Unnamed(unnamed) => match unnamed.unnamed.len() {
             0 => todo!(),
-            1 => parse_newtype(unnamed.unnamed[0].clone(), holder),
-            _ => parse_tuple(unnamed, holder)
+            1 => parse_newtype(unnamed.unnamed[0].clone(), holder, &generic_names),
+            _ => parse_tuple(unnamed, holder, &generic_names)
         }
         syn::Fields::Unit => parse_quote!(::tsclient::types::model::InnerType::Null),
         
