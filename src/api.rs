@@ -78,7 +78,7 @@ impl ClientObject {
                         result += ",";
                     }
                     let nested = ty.to_ts(format!("{}\t", base_tabs));
-                    result += &format!("\n\t{}{}: {}", base_tabs, field, nested);
+                    result += &format!("\n\t{}{}: {}", base_tabs, clean_var_name(field), nested);
                 }
             },
             ClientObject::Method(m) => return m.to_owned(),
