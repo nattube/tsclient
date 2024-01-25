@@ -154,7 +154,12 @@ impl InnerType {
                     let renamed_comp = if let Some(import) = sub_comp.build(builder, registry) {
                         let (name,_) = builder.get_type_and_import(&import, sub_comp.hash, 0);
                         imports.insert(name.clone(), (name.clone(), refr.renamed.clone()));
-                        refr.renamed.clone().or(Some(name))
+                        refr.renamed.clone().or_else(|| {
+                            match sub_comp.typ {
+                                Type::Array(_) => Some(format!("{}Array", name)),
+                                _ => Some(name)
+                            } 
+                        })
                     } else {
                         refr.renamed.clone()
                     };
@@ -192,7 +197,12 @@ impl InnerType {
                     let renamed_comp = if let Some(import) = sub_comp.build(builder, registry) {
                         let (name,_) = builder.get_type_and_import(&import, sub_comp.hash, 0);
                         imports.insert(name.clone(), (name.clone(), refr.renamed.clone()));
-                        refr.renamed.clone().or(Some(name))
+                        refr.renamed.clone().or_else(|| {
+                            match sub_comp.typ {
+                                Type::Array(_) => Some(format!("{}Array", name)),
+                                _ => Some(name)
+                            } 
+                        })
                     } else {
                         refr.renamed.clone()
                     };
@@ -227,7 +237,12 @@ impl InnerType {
                 let renamed_comp = if let Some(import) = sub_comp.build(builder, registry) {
                     let (name,_) = builder.get_type_and_import(&import, sub_comp.hash, 0);
                     imports.insert(name.clone(), (name.clone(), refr.renamed.clone()));
-                    refr.renamed.clone().or(Some(name))
+                    refr.renamed.clone().or_else(|| {
+                        match sub_comp.typ {
+                            Type::Array(_) => Some(format!("{}Array", name)),
+                            _ => Some(name)
+                        } 
+                    })
                 } else {
                     refr.renamed.clone()
                 };
