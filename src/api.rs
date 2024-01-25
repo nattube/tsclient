@@ -329,13 +329,12 @@ impl Route {
             for content in method.content.iter() {
                 let indexed = content.get_indexed();
                 let main_component = registry.get_indexed(indexed);
-                let component = main_component.get_import_component(registry);
 
                 let clean_name = clean_var_name(&main_component.get_ts_name(registry));
 
                 self.adjust_route_obj(&mut route_obj, content, &clean_name, route, &main_component, registry);
 
-                match content {
+                let component = match content {
                     RouteComponentType::Query(_) |
                     RouteComponentType::Path(_)  |
                     RouteComponentType::Json(Postion::Body, _) |
@@ -343,18 +342,22 @@ impl Route {
                         let (typ, _) = builder.get_type_and_import(&main_component.name, main_component.hash, level);
                         route_inputs_builder.push(format!("{}: {}", clean_name, typ));
                         route_inputs_names.push(clean_name.clone());
+                        main_component.get_import_component(registry, Postion::Body)
                     },
                     
                     RouteComponentType::Raw(Postion::Result, _) |
                     RouteComponentType::Json(Postion::Result, _) => {
-                        route_result_builder = format!("Promise<{}>", main_component.get_client_result(registry));       
+                        route_result_builder = format!("Promise<{}>", main_component.get_client_result(registry));    
+                        main_component.get_import_component(registry, Postion::Result)   
                     },
-                }
+                };
 
-                if let Some(comp) = component {
-                    let (typ, import) = builder.get_type_and_import(&comp.name, comp.hash, level);
-                    if import != "" {
-                        imports.insert(typ, import);
+                if let Some(comps) = component {
+                    for comp in comps {
+                        let (typ, import) = builder.get_type_and_import(&comp.name, comp.hash, level);
+                        if import != "" {
+                            imports.insert(typ, import);
+                        }
                     }
                 }
             }

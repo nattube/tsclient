@@ -182,7 +182,7 @@ impl<S: Clone + Send,B: HttpBody + Send + 'static> ApiMethodRouter<S,B,Infallibl
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum Postion {
     Body,
     Result

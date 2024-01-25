@@ -1,4 +1,6 @@
-use std::{hash::{DefaultHasher, Hasher as _, Hash as _}, collections::HashMap};
+use std::{hash::{DefaultHasher, Hasher as _, Hash as _}, collections::{HashMap, HashSet}};
+
+use crate::api_router::Postion;
 
 use super::builder::{HasIndexed, TypeBuilder, GlobalTypeRegistry};
 
@@ -30,11 +32,30 @@ impl Component {
         }
     }
 
-    pub fn get_import_component(&self, registry: &GlobalTypeRegistry) -> Option<Component> {
+    pub fn get_import_component(&self, registry: &GlobalTypeRegistry, pos: Postion) -> Option<Vec<Component>> {
         match &self.typ {
-            Type::Array(x) => registry.get_indexed(&x.id).get_import_component(registry),
-            Type::Struct(_) => Some(self.clone()),
-            Type::Enum(_, _) => Some(self.clone()),
+            Type::Array(x) => registry.get_indexed(&x.id).get_import_component(registry, pos),
+            Type::Struct(_) => Some(vec![self.clone()]),
+            Type::Enum(_, vals) => {
+                if let Postion::Body = pos {
+                    return Some(vec![self.clone()])
+                }
+
+                if vals.len() == 2 && vals[0].0 == "Ok" && vals[1].0 == "Err" {
+                    if let (InnerType::NewType(ok), InnerType::NewType(err)) = (&vals[0].1, &vals[1].1) {
+                        return match (registry.get_indexed(&ok.id).get_import_component(registry, pos), registry.get_indexed(&err.id).get_import_component(registry, pos)) {
+                            (None, None) => None,
+                            (None, Some(x)) => Some(x),
+                            (Some(x), None) => Some(x),
+                            (Some(mut x), Some(y)) => {
+                                x.extend(y);
+                                Some(x)
+                            },
+                        }
+                    }
+                }
+                Some(vec![self.clone()])
+            },
             Type::SimpleType(_) => None,
             Type::Any => None,
             Type::None => None,
