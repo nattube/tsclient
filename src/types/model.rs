@@ -219,7 +219,7 @@ impl InnerType {
 
                 let result = match repr {
                     Some((EnumRepresentation::Adjacently(tag, var), typ)) => {
-                        format!("{{\n\t{}: {};\n\t{}: {}\n}}", tag, typ, var, sub_name)
+                        format!("{{\n\t{}: \"{}\";\n\t{}: {}\n}}", tag, typ, var, sub_name)
                     }
                     Some((EnumRepresentation::Default, typ)) => {
                         format!("{{\n\t{}: {}\n}}", typ, sub_name)
