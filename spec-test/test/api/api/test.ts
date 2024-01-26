@@ -46,7 +46,7 @@ export async function postTest(test3: Test3, test: Test): Promise<ApiResult<Test
         let error = await __result.json();
         return {
             isError: true, 
-            status_code: __result.status,  
+            status: __result.status,  
             error
         }
     } else {
@@ -83,7 +83,7 @@ export async function getTest(): Promise<ApiResult<UserInfo, any>> {
         let error = await __result.json();
         return {
             isError: true, 
-            status_code: __result.status,  
+            status: __result.status,  
             error
         }
     } else {

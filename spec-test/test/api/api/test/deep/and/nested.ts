@@ -46,7 +46,7 @@ export async function createNested(test3: Test3, test: Test): Promise<ApiResult<
         let error = await __result.json();
         return {
             isError: true, 
-            status_code: __result.status,  
+            status: __result.status,  
             error
         }
     } else {

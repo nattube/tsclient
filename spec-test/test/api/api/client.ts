@@ -33,5 +33,5 @@ const client = new Client();
 
 export default client;
 
-export type ApiResult<T, E> = T | {isError: true, status_code: number,  error: E};
+export type ApiResult<T, E> = T | {isError: true, status: number,  error: E};
         
