@@ -325,7 +325,7 @@ impl Type {
     fn build_inner_query_string(&self, main_name: &str, field_name: &str) -> String {
         match self {
             Type::Array(_) => format!("\tif({}{} != null) {{ {}{}.forEach(val => __params.append('{}', val.toString())); }}", main_name, field_name, main_name, field_name, field_name.replace(".", "").replace("[", "").replace("]", "")),
-            _ => format!("\tif({}{} != null) {{ __params.append('{}', {}{}.toString()) }}", main_name, field_name, field_name.replace(".", "").replace("[", "").replace("]", ""), main_name, field_name),
+            _ => format!("\tif({}?{} != null) {{ __params.append('{}', {}{}.toString()) }}", main_name, field_name, field_name.replace(".", "").replace("[", "").replace("]", ""), main_name, field_name),
         }
     }
 
@@ -337,7 +337,7 @@ impl Type {
                 for (_, variant) in variants {
                     strs.push(variant.inner_query_string_builder(name, registry))
                 }
-                
+
                 strs.join("\n")
             }
             _=> return String::new()
