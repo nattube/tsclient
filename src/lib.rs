@@ -26,6 +26,8 @@ use types::model::Type;
 pub use typescript::TypeScript;
 pub use typescript::TypeScriptStrict;
 
+//TODO: Remove Hash and include TypeId
+
 static GLOBAL_TYPE_REGISTRY: Lazy<Mutex<GlobalTypeRegistry>> = Lazy::new(|| {
     Mutex::new(GlobalTypeRegistry::new())
 });
