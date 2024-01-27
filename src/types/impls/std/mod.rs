@@ -48,7 +48,9 @@ impl<T: TypescriptType + 'static, E: TypescriptType + 'static> TypescriptType fo
         let mut hasher = DefaultHasher::new();
         "enum".hash(&mut hasher);
         Self::name().hash(&mut hasher);
+        T::name().hash(&mut hasher);
         T::hash(registry).hash(&mut hasher);
+        E::name().hash(&mut hasher);
         E::hash(registry).hash(&mut hasher);
 
         let hash = hasher.finish();
@@ -105,6 +107,7 @@ impl<T: TypescriptType + 'static> TypescriptType for Option<T> {
         let mut hasher = DefaultHasher::new();
         "enum".hash(&mut hasher);
         Self::name().hash(&mut hasher);
+        T::name().hash(&mut hasher);
         T::hash(registry).hash(&mut hasher);
 
         let hash = hasher.finish();
