@@ -138,6 +138,33 @@ fn update_declarations(declarations: &mut HashMap<String, String>, subcomponent:
 }
 
 impl InnerType {
+
+    pub fn inner_query_string_builder(&self, name: &str, registry: &GlobalTypeRegistry) -> String {
+        match self {
+            InnerType::Object(x) => {
+                let mut assignments = Vec::new();
+                for (field, r) in x.iter() {
+                    let sub = registry.get_indexed(&r.id);
+                    assignments.push(sub.typ.build_inner_query_string(name, &format!(".{}", field)));
+                }
+                return assignments.join("\n");
+            },
+            InnerType::Tuple(x) => {
+                let mut assignments = Vec::new();
+                for (field, r) in x.iter().enumerate() {
+                    let sub = registry.get_indexed(&r.id);
+                    assignments.push(sub.typ.build_inner_query_string(name, &format!("[{}]", field)));
+                }
+                return assignments.join("\n");
+            },
+            InnerType::NewType(x) => {
+                let sub = registry.get_indexed(&x.id);
+                sub.typ.build_query_string(name, registry)
+            },
+            _ => return String::new()
+        }
+    }
+
     pub fn build(&self, builder: &mut TypeBuilder, registry: &GlobalTypeRegistry, declarations: &mut HashMap<String, String>, repr: Option<(EnumRepresentation, &str)>) -> (String, HashMap<String,(String, Option<String>)>) {
         let (content, imports) = match self {
             InnerType::Object(fields) => {
@@ -304,29 +331,15 @@ impl Type {
 
     pub fn build_query_string(&self, name: &str, registry: &GlobalTypeRegistry) -> String {
         match self {
-            Type::Struct(inner) => match inner {
-                InnerType::Object(x) => {
-                    let mut assignments = Vec::new();
-                    for (field, r) in x.iter() {
-                        let sub = registry.get_indexed(&r.id);
-                        assignments.push(sub.typ.build_inner_query_string(name, &format!(".{}", field)));
-                    }
-                    return assignments.join("\n");
-                },
-                InnerType::Tuple(x) => {
-                    let mut assignments = Vec::new();
-                    for (field, r) in x.iter().enumerate() {
-                        let sub = registry.get_indexed(&r.id);
-                        assignments.push(sub.typ.build_inner_query_string(name, &format!("[{}]", field)));
-                    }
-                    return assignments.join("\n");
-                },
-                InnerType::NewType(x) => {
-                    let sub = registry.get_indexed(&x.id);
-                    sub.typ.build_query_string(name, registry)
-                },
-                _ => return String::new()
-            },
+            Type::Struct(inner) => inner.inner_query_string_builder(name, registry),
+            Type::Enum(repr, variants) => {
+                let mut strs = Vec::new();
+                for (_, variant) in variants {
+                    strs.push(variant.inner_query_string_builder(name, registry))
+                }
+                
+                strs.join("\n")
+            }
             _=> return String::new()
         }
     }
