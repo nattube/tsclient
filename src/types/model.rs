@@ -295,11 +295,11 @@ impl InnerType {
             InnerType::SimpleVariant(x) => {
                 let result = match repr {
                     Some((EnumRepresentation::Adjacently(tag, _), typ)) => {
-                        format!("{{\n\t{}: {};\n}}", tag, typ)
+                        format!("{{\n\t{}: \"{}\";\n}}", tag, typ)
                     },
-                    _ => x.to_owned()
+                    _ => format!(r#"{}"#, x)
                 };
-                (format!(r#""{}""#, result), HashMap::new())
+                (format!(r#"{}"#, result), HashMap::new())
             },
             InnerType::Null => (String::from("null"), HashMap::new()),
         };
