@@ -5,7 +5,7 @@ use serde::Serialize;
 use tower_layer::Layer;
 use tower_service::Service;
 
-use crate::{api::{Api, Route, HTTPMethod, Method}, types::{model::ComponentReference, builder::{HasIndexed, GlobalTypeRegistry}, TypescriptType}, GLOBAL_TYPE_REGISTRY};
+use crate::{api::{Api, Route, HTTPMethod, Method}, types::{model::ComponentReference, builder::{HasIndexed, GlobalTypeRegistry}, TypescriptType}, Postion, GLOBAL_TYPE_REGISTRY};
 
 pub trait IntoMethodRouter<S,B,E> {
     fn into_method_router(self) -> MethodRouter<S,B,E>;
@@ -180,12 +180,6 @@ impl<S: Clone + Send,B: HttpBody + Send + 'static> ApiMethodRouter<S,B,Infallibl
 
         self.on(HTTPMethod::DELETE, handler)
     }
-}
-
-#[derive(Debug, Copy, Clone)]
-pub enum Postion {
-    Body,
-    Result
 }
 
 #[derive(Debug)]

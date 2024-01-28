@@ -1,6 +1,6 @@
 use std::{hash::{DefaultHasher, Hasher as _, Hash as _}, collections::{HashMap, HashSet}};
 
-use crate::api_router::Postion;
+use crate::Postion;
 
 use super::builder::{HasIndexed, TypeBuilder, GlobalTypeRegistry};
 

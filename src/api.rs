@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::Mutex, path::{PathBuf}, error::Error, fs, 
 use axum::{http::method, routing::{MethodRouter, MethodFilter}, handler::Handler, body::HttpBody};
 use regex::Regex;
 
-use crate::{types::{builder::{GlobalTypeRegistry, TypeBuilder}, model::Component}, api_router::{RouteComponentType, Postion}, utils::{clean_var_name, capitalize_first_letter}, FILE_HEADER};
+use crate::{types::{builder::{GlobalTypeRegistry, TypeBuilder}, model::Component}, Postion, api_router::RouteComponentType, utils::{clean_var_name, capitalize_first_letter}, FILE_HEADER};
 
 pub struct ClientObjectBuilder {
     obj: ClientObject,

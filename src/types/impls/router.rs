@@ -2,7 +2,7 @@ use std::future::Future;
 
 use axum::{extract::{Query, State}, Json, Extension};
 
-use crate::{types::{TypescriptType, builder::GlobalTypeRegistry}, api_router::{Buildable, Postion, RouteComponentType, ApiBuildable}};
+use crate::{types::{TypescriptType, builder::GlobalTypeRegistry}, Postion, api_router::{Buildable, RouteComponentType, ApiBuildable}};
 
 impl<T> Buildable for State<T> {
     fn build(_registry: &mut GlobalTypeRegistry, _pos: Postion) -> Option<RouteComponentType> {

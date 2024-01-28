@@ -4,6 +4,7 @@ use super::{TypescriptType, builder::{GlobalTypeRegistry, HasIndexed}, model::{C
 
 pub mod std;
 pub mod chrono;
+#[cfg(not(target_family = "wasm"))]
 pub mod router;
 pub mod json;
 

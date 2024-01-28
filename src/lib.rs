@@ -9,13 +9,17 @@ use once_cell::sync::Lazy;
 use serde::{Serialize, Deserialize};
 
 pub mod types;
+#[cfg(not(target_family = "wasm"))]
 pub mod axum;
 pub mod prelude;
+#[cfg(not(target_family = "wasm"))]
 pub mod api;
 
 pub(crate) mod errors;
+#[cfg(not(target_family = "wasm"))]
 pub(crate) mod api_router;
 pub(crate) mod utils;
+#[cfg(not(target_family = "wasm"))]
 pub(crate) mod routing;
 
 use types::TypescriptType;
@@ -25,6 +29,12 @@ use types::model::Component;
 use types::model::Type;
 pub use typescript::TypeScript;
 pub use typescript::TypeScriptStrict;
+
+#[derive(Debug, Copy, Clone)]
+pub enum Postion {
+    Body,
+    Result
+}
 
 //TODO: Remove Hash and include TypeId
 
@@ -91,6 +101,7 @@ impl TypescriptType for T1 {
 
 
 #[cfg(test)]
+#[cfg(not(target_family = "wasm"))]
 mod tests {
     use std::{collections::HashMap, hash::{DefaultHasher, Hasher as _}};
 
