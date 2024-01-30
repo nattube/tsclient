@@ -410,7 +410,11 @@ export async function {method_base_name}_RAW({inputs}): Promise<Response> {{
                 inputs = inputs, 
                 route = route));
 
-
+            let extract_body = if route_result_builder.starts_with("Promise<ApiResult<null,") {
+                "null;"
+            } else {
+                "await __result.json();"
+            };
             
             file_content.push(format!(r#"
 export async function {method_base_name}({inputs}): {result} {{
@@ -424,7 +428,7 @@ export async function {method_base_name}({inputs}): {result} {{
             error
         }}
     }} else {{
-        let ok = await __result.json();
+        let ok = {extract_body}
         return {{
             isError: false,
             ok
@@ -435,7 +439,9 @@ export async function {method_base_name}({inputs}): {result} {{
                 method_base_name = method_base_name, 
                 inputs = inputs, 
                 imput_names = input_names,
-                result = route_result_builder)) 
+                result = route_result_builder,
+                extract_body = extract_body
+            )) 
 
         }
 
