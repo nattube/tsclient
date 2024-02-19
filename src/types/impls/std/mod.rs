@@ -1,5 +1,5 @@
 use core::hash;
-use std::{any::TypeId, hash::{DefaultHasher, Hash as _, Hasher as _}};
+use std::{any::TypeId, collections::hash_map::DefaultHasher, hash::{Hash as _, Hasher as _}};
 
 use crate::types::{builder::{GlobalTypeRegistry, HasIndexed}, TypescriptType, model::{ComponentReference, Component, Type, EnumRepresentation, InnerType}};
 
