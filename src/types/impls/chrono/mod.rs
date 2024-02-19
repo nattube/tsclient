@@ -1,6 +1,3 @@
-use core::hash;
-use std::{any::TypeId, hash::{DefaultHasher, Hash as _, Hasher as _}};
-
 use chrono::{Utc, DateTime, Local, NaiveDate};
 
 use crate::types::{builder::{GlobalTypeRegistry, HasIndexed}, TypescriptType, model::{ComponentReference, Component, Type, EnumRepresentation, InnerType}};

@@ -1,4 +1,4 @@
-use ::std::{any::TypeId, hash::{DefaultHasher, Hash as _, Hasher as _}};
+use ::std::{any::TypeId, collections::hash_map::DefaultHasher, hash::{ Hash as _, Hasher as _}};
 
 use super::{TypescriptType, builder::{GlobalTypeRegistry, HasIndexed}, model::{Component, Type}};
 

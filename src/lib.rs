@@ -103,7 +103,7 @@ impl TypescriptType for T1 {
 #[cfg(test)]
 #[cfg(not(target_family = "wasm"))]
 mod tests {
-    use std::{collections::HashMap, hash::{DefaultHasher, Hasher as _}};
+    use std::{collections::HashMap, collections::hash_map::DefaultHasher, hash::{Hasher as _}};
 
     use ::axum::{extract::Query, Json};
 

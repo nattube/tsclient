@@ -1,4 +1,4 @@
-use std::{hash::{DefaultHasher, Hasher as _, Hash as _}, collections::{HashMap, HashSet}};
+use std::{collections::hash_map::DefaultHasher, hash::{Hasher as _, Hash as _}, collections::{HashMap, HashSet}};
 
 use crate::Postion;
 
