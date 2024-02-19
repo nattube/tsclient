@@ -122,12 +122,12 @@ fn ts_internal(parse: syn::Data, generics: syn::Generics, ident: syn::Ident, att
                 let mut __hash_block = ::std::vec::Vec::new();
                 #(#hashes)*
 
-                let mut __hasher = ::std::hash::DefaultHasher::new();
+                let mut __hasher = ::std::collections::hash_map::DefaultHasher::new();
                 __hash_block.sort();
                 <::std::primitive::str as ::std::hash::Hash>::hash(#hash_lit, &mut __hasher);
                 <::std::vec::Vec<::std::primitive::u64> as ::std::hash::Hash>::hash(&__hash_block, &mut __hasher);
 
-                let hash = <::std::hash::DefaultHasher as ::std::hash::Hasher>::finish(&__hasher);
+                let hash = <::std::collections::hash_map::DefaultHasher as ::std::hash::Hasher>::finish(&__hasher);
                 registry.finalize_hash(type_id, hash);
 
                 return hash;
