@@ -49,6 +49,16 @@ impl<S: Clone + Send + Sync + 'static, B: HttpBody + Send + 'static> ApiRouter<S
         self
     }
 
+    pub fn nest_service_without_api<T>(mut self, path: &str, service: T) -> Self
+    where 
+        T: Service<Request<B>, Error = Infallible> + Clone + Send + 'static,
+        T::Response: IntoResponse,
+        T::Future: Send + 'static, {
+            self.router = self.router.nest_service(path, service);
+
+            return self
+    }
+
     pub fn route(mut self, route: &str, method: ApiMethodRouter<S, B>) -> Self {
         self.api.routes.insert(route.to_owned(), method.route);
         self.router = self.router.route(route, method.router);
