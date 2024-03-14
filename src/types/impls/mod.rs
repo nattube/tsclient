@@ -24,9 +24,11 @@ pub fn boilerplate_simple_definition<T: TypescriptType + 'static>(typ: Type, reg
     
     let hash = T::hash(registry);
     let name = T::name();
+    let generics = T::generics();
 
     registry.finalize(type_id, Component {
         name,
+        generics,
         typ,
         hash,
     })

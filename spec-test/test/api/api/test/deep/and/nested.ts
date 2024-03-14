@@ -7,7 +7,6 @@
 import { type Test3 } from "../../../../dto/Test3";
 import __client__, {type ApiResult} from "../../../client"
 import { type Test } from "../../../../dto/Test";
-import { type Result1 } from "../../../../dto/Result1";
 
  
 export async function createNested_RAW(test3: Test3, test: Test): Promise<Response> {
@@ -20,10 +19,10 @@ export async function createNested_RAW(test3: Test3, test: Test): Promise<Respon
     
     const __params = new URLSearchParams();
 
-	if(test3.field1 != null) { test3.field1.forEach(val => __params.append('field1', val.toString())); }
-	if(test3.field2 != null) { __params.append('field2', test3.field2.toString()) }
-	if(test3.field3 != null) { __params.append('field3', test3.field3.toString()) }
-	if(test3.field4 != null) { __params.append('field4', test3.field4.toString()) }
+	if(test3?.field1 != null) { test3.field1.forEach(val => __params.append('field1', val.toString())); }
+	if(test3?.field2 != null) { __params.append('field2', test3.field2.toString()) }
+	if(test3?.field3 != null) { __params.append('field3', test3.field3.toString()) }
+	if(test3?.field4 != null) { __params.append('field4', test3.field4.toString()) }
 
     const __queryString = "?" + __params.toString();
 
@@ -39,17 +38,21 @@ export async function createNested_RAW(test3: Test3, test: Test): Promise<Respon
 
 
 
-export async function createNested(test3: Test3, test: Test): Promise<ApiResult<Array<string>, string>> {
+export async function createNested(test3: Test3, test: Test): Promise<ApiResult<Array<Test>, string>> {
     let __result = await createNested_RAW(test3, test);
 
     if(!__result.ok) {
         let error = await __result.json();
         return {
-            isError: true, 
+            ok: false, 
             status: __result.status,  
             error
         }
     } else {
-        return await __result.json()
+        let value = await __result.json();
+        return {
+            ok: true,
+            value
+        }
     }
 }

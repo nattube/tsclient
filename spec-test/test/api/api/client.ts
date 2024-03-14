@@ -4,15 +4,14 @@
  * WARNING: Changes you perform here will probably not persist!
 */
 
+import { getTest, postTest } from "./test";
 import { createNested } from "./test/deep/and/nested";
-import { postTest, getTest } from "./test";
 
 class Client {
     BASE_PATH = "";
 
     API = {
 		test: {
-			getTest: getTest,
 			deep: {
 				and: {
 					nested: {
@@ -20,6 +19,7 @@ class Client {
 					}
 				}
 			},
+			getTest: getTest,
 			postTest: postTest
 		}
 	}
@@ -33,5 +33,5 @@ const client = new Client();
 
 export default client;
 
-export type ApiResult<T, E> = T | {isError: true, status: number,  error: E};
+export type ApiResult<T, E> = {ok: true, value: T} | {ok: false, status: number,  error: E};
         

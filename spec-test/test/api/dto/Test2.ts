@@ -3,7 +3,7 @@
  * 
  * WARNING: Changes you perform here will probably not persist!
 */
-import {type Result as Result} from "./Result";
+import {type Result} from "./Result";
 
 
 export type Test2 = {

@@ -10,14 +10,14 @@ pub trait GetDefinition<T> {
     fn get_definition(self, registry: &mut GlobalTypeRegistry) -> HasIndexed;
     fn hash(self, registry: &mut GlobalTypeRegistry) -> u64;
     fn name(self) -> String;
-    fn ts_name(self) -> String;
+    fn generics(self) -> String;
 }
 
 pub trait TypescriptType {
     fn get_definition(registry: &mut GlobalTypeRegistry) -> HasIndexed;
     fn hash(registry: &mut GlobalTypeRegistry) -> u64;
     fn name() -> String;
-    fn ts_name() -> String;
+    fn generics() -> String;
 }
 
 impl<T> GetDefinition<T> for &TypeHolder<T> {
@@ -35,7 +35,7 @@ impl<T> GetDefinition<T> for &TypeHolder<T> {
     fn name(self) -> String {
         String::from("any")
     }
-    fn ts_name(self) -> String {
+    fn generics(self) -> String {
         String::from("any")
     }
     fn hash(self, registry: &mut GlobalTypeRegistry) -> u64 {
@@ -53,8 +53,8 @@ impl<T: TypescriptType> GetDefinition<T> for &TypeHolderStrict<T> {
     fn hash(self, registry: &mut GlobalTypeRegistry) -> u64 {
         T::hash(registry)
     }
-    fn ts_name(self) -> String {
-        T::ts_name()
+    fn generics(self) -> String {
+        T::generics()
     }
 }
 impl<T: TypescriptType> GetDefinition<T> for &mut &TypeHolder<T> {
@@ -67,8 +67,8 @@ impl<T: TypescriptType> GetDefinition<T> for &mut &TypeHolder<T> {
     fn hash(self, registry: &mut GlobalTypeRegistry) -> u64 {
         T::hash(registry)
     }
-    fn ts_name(self) -> String {
-        T::ts_name()
+    fn generics(self) -> String {
+        T::generics()
     }
 }
 

@@ -7,7 +7,7 @@ macro_rules! ts_simple {
             fn name() -> String {
                 String::from($typ_name)
             }
-            fn ts_name() -> String {
+            fn generics() -> String {
                 String::from($ts_typ)
             }
             fn hash(registry: &mut GlobalTypeRegistry) -> u64 {
@@ -41,6 +41,7 @@ macro_rules! ts_tuple {
             
                 let component = Component {
                     name: format!("Tuple"),
+                    generics: String::new(),
                     typ: Type::Struct(
                         InnerType::Tuple(subs)
                     ),
@@ -57,10 +58,10 @@ macro_rules! ts_tuple {
 
                 format!("({})", names.join(", "))
             }
-            fn ts_name() -> String {
+            fn generics() -> String {
                 let mut names = Vec::new();
                 $(
-                    names.push($typ::ts_name());
+                    names.push($typ::name());
                 )+
                 format!("[{}]", names.join(", "))
             }
@@ -104,7 +105,7 @@ macro_rules! ts_array_base {
         fn name() -> String {
             $typ_name
         }
-        fn ts_name() -> String {
+        fn generics() -> String {
             String::from($ts_typ)
         }
         fn hash(registry: &mut GlobalTypeRegistry) -> u64 {

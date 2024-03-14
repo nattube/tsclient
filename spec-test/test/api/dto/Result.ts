@@ -15,4 +15,4 @@ export type Err = {
 }
 
 
-export type Result = Ok | Err
+export type ResultResult = Ok | Err

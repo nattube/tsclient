@@ -4,7 +4,7 @@
  * WARNING: Changes you perform here will probably not persist!
 */
 import {type Option} from "./Option";
-import {type Option1} from "./Option1";
+import {type Test} from "./Test";
 
 
 export type Test3 = {

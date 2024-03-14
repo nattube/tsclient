@@ -1,4 +1,4 @@
-workspace = { members = ["macros/typescript", "spec-test"] }
+workspace = { members = [ "from_scratch","macros/typescript", "spec-test"] }
 [package]
 name = "tsclient"
 version = "0.1.0"

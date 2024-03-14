@@ -5,10 +5,10 @@
 */
 
 
-export type Ok = number
+export type Some = T
 
 
 export type None = null
 
 
-export type Option = Ok | None
+export type Option<T> = Some | None

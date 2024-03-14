@@ -3,10 +3,11 @@
  * 
  * WARNING: Changes you perform here will probably not persist!
 */
+import {type Test} from "./Test";
 
 
 export type Ok = {
-	Ok: Array<string>
+	Ok: Array<Test>
 }
 
 
@@ -15,4 +16,4 @@ export type Err = {
 }
 
 
-export type Result1 = Ok | Err
+export type Result1Result = Ok | Err

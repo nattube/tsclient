@@ -73,6 +73,7 @@ impl TypescriptType for T1 {
 
         registry.finalize(type_id, Component {
             name: String::from("T1"),
+            generics: Self::generics(),
             typ: Type::SimpleType(String::from("T1")),
             hash,
         })
@@ -80,7 +81,7 @@ impl TypescriptType for T1 {
     fn name() -> String {
         String::from("T1")
     }
-    fn ts_name() -> String {
+    fn generics() -> String {
         String::from("T1")
     }
     fn hash(registry: &mut GlobalTypeRegistry) -> u64 {

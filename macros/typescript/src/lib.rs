@@ -84,6 +84,11 @@ fn ts_internal(parse: syn::Data, generics: syn::Generics, ident: syn::Ident, att
     };
 
     let id_name = ident.to_string();
+
+    let mut generics_type = gen_inner.clone().map(|g| g.to_token_stream().to_string()).collect::<Vec<_>>().join(", ");
+    if generics_type != "" {
+        generics_type = format!("<{}>", generics_type);
+    }
     
     let output = quote! {
 
@@ -100,6 +105,7 @@ fn ts_internal(parse: syn::Data, generics: syn::Generics, ident: syn::Ident, att
 
                 let component = ::tsclient::types::model::Component {
                     name: #id_name.to_string(),
+                    generics: #generics_type.to_string(),
                     typ,
                     hash
                 };
@@ -109,8 +115,8 @@ fn ts_internal(parse: syn::Data, generics: syn::Generics, ident: syn::Ident, att
             fn name() -> ::std::string::String {
                 String::from(#id_name)
             }
-            fn ts_name() -> ::std::string::String {
-                String::from(#id_name)
+            fn generics() -> ::std::string::String {
+                String::from(#generics_type)
             }
             fn hash(registry: &mut ::tsclient::types::builder::GlobalTypeRegistry) -> ::std::primitive::u64 {
                 let type_id = ::std::any::TypeId::of::<Self>();

@@ -13,9 +13,15 @@ use super::builder::{HasIndexed, TypeBuilder, GlobalTypeRegistry};
 
 pub struct AnyType;
 
+pub struct BuildTypeInfos {
+    name: String,
+    imports: Vec<String>
+}
+
 #[derive(Clone, Debug)]
 pub struct Component {
     pub name: String,
+    pub generics: String,
     pub typ: Type,
     pub hash: u64,
 }
@@ -27,6 +33,7 @@ impl Component {
 
         Self {
             name: String::from("any"),
+            generics: String::new(),
             typ: Type::Any,
             hash: hasher.finish(),
         }
@@ -55,6 +62,25 @@ impl Component {
                     }
                 }
                 Some(vec![self.clone()])
+            },
+            Type::Generic(base, generics) => {  
+
+                let base_comp = registry
+                    .get_indexed(&base.id)
+                    .get_import_component(registry, pos);
+
+                let res = generics.iter()
+                    .map(|x| {
+                        registry
+                            .get_indexed(&x.id)
+                            .get_import_component(registry, pos)
+                            .unwrap_or(Vec::new())
+                    }).flatten()
+                    .chain(base_comp.into_iter().flatten())
+                    .collect();
+
+                Some(res)
+                    
             },
             Type::SimpleType(_) => None,
             Type::Any => None,
@@ -87,17 +113,25 @@ impl Component {
             Type::Array(x) => format!("Array<{}>", registry.get_indexed(&x.id).get_ts_name(registry)),
             Type::Struct(_) => self.name.clone(),
             Type::Enum(_, _) => self.name.clone(),
+            Type::Generic(this, gen) => {
+                //let generics = gen.iter()
+                //    .map(|g| registry.get_indexed(&g.id).get_ts_name(registry))
+                //    .collect::<Vec<String>>().join(", ");
+                //
+                //format!("{}<{}>", self.name, generics)
+                registry.get_indexed(&this.id).get_ts_name(registry)
+            }
             Type::SimpleType(x) => x.clone(),
             Type::Any => String::from("any"),
             Type::None => String::from("null"),
         }
     }
 
-    pub fn build(&self, builder: &mut TypeBuilder, registry: &GlobalTypeRegistry) -> Option<String> {
+    pub fn build(&self, builder: &mut TypeBuilder, registry: &GlobalTypeRegistry) -> Option<BuildTypeInfos> {
         if self.name == "Result" {
             println!("Result hash: {}!!!!", self.hash)
         }
-        self.typ.build(&self.name, self.hash, builder, registry)
+        self.typ.build(&self.name, &self.generics, self.hash, builder, registry)
     }
 }
 
@@ -132,6 +166,7 @@ fn update_declarations(declarations: &mut HashMap<String, String>, subcomponent:
             },
 
             Type::Struct(_) |
+            Type::Generic(_,_) |
             Type::Enum(_, _) => return,
         }
     }
@@ -178,17 +213,16 @@ impl InnerType {
                 for (field, refr) in fields {
                     let sub_comp = registry.get_indexed(&refr.id);
 
-                    let renamed_comp = if let Some(import) = sub_comp.build(builder, registry) {
-                        let (name,_) = builder.get_type_and_import(&import, sub_comp.hash, 0);
-                        imports.insert(name.clone(), (name.clone(), refr.renamed.clone()));
-                        refr.renamed.clone().or_else(|| {
-                            match sub_comp.typ {
-                                Type::Array(_) => Some(format!("{}Array", name)),
-                                _ => Some(name)
-                            } 
-                        })
-                    } else {
-                        refr.renamed.clone()
+                    let sub_res =  sub_comp.build(builder, registry);
+
+                    let renamed_comp = match sub_res {
+                        Some(import) => {
+                            for imp in import.imports {
+                                imports.insert(imp.clone(), (imp, None));
+                            }
+                            refr.renamed.clone()
+                        },
+                        None => refr.renamed.clone(),
                     };
 
                     update_declarations(declarations, sub_comp, &renamed_comp, registry);
@@ -221,17 +255,16 @@ impl InnerType {
                 for refr in refs {
                     let sub_comp = registry.get_indexed(&refr.id);
 
-                    let renamed_comp = if let Some(import) = sub_comp.build(builder, registry) {
-                        let (name,_) = builder.get_type_and_import(&import, sub_comp.hash, 0);
-                        imports.insert(name.clone(), (name.clone(), refr.renamed.clone()));
-                        refr.renamed.clone().or_else(|| {
-                            match sub_comp.typ {
-                                Type::Array(_) => Some(format!("{}Array", name)),
-                                _ => Some(name)
-                            } 
-                        })
-                    } else {
-                        refr.renamed.clone()
+                    let sub_res =  sub_comp.build(builder, registry);
+
+                    let renamed_comp = match sub_res {
+                        Some(import) => {
+                            for imp in import.imports {
+                                imports.insert(imp.clone(), (imp, None));
+                            }
+                            refr.renamed.clone()
+                        },
+                        None => refr.renamed.clone(),
                     };
 
                     update_declarations(declarations, sub_comp, &refr.renamed, registry);
@@ -261,17 +294,16 @@ impl InnerType {
 
                 let sub_comp = registry.get_indexed(&refr.id);
 
-                let renamed_comp = if let Some(import) = sub_comp.build(builder, registry) {
-                    let (name,_) = builder.get_type_and_import(&import, sub_comp.hash, 0);
-                    imports.insert(name.clone(), (name.clone(), refr.renamed.clone()));
-                    refr.renamed.clone().or_else(|| {
-                        match sub_comp.typ {
-                            Type::Array(_) => Some(format!("{}Array", name)),
-                            _ => Some(name)
-                        } 
-                    })
-                } else {
-                    refr.renamed.clone()
+                let sub_res =  sub_comp.build(builder, registry);
+
+                let renamed_comp = match sub_res {
+                    Some(import) => {
+                        for imp in import.imports {
+                            imports.insert(imp.clone(), (imp, None));
+                        }
+                        refr.renamed.clone()
+                    },
+                    None => refr.renamed.clone(),
                 };
 
                 let _alternative = sub_comp.get_ts_name(registry);
@@ -323,6 +355,7 @@ pub enum Type {
     Array(ComponentReference),
     Struct(InnerType),
     Enum(EnumRepresentation, Vec<(String, InnerType)>),
+    Generic(ComponentReference, Vec<ComponentReference>),
     SimpleType(String),
     Any,
     None,
@@ -352,12 +385,15 @@ impl Type {
         }
     }
 
-    pub fn build(&self, name: &str, hash: u64, builder: &mut TypeBuilder, registry: &GlobalTypeRegistry) -> Option<String> {
+    pub fn build(&self, name: &str, generics: &str, hash: u64, builder: &mut TypeBuilder, registry: &GlobalTypeRegistry) -> Option<BuildTypeInfos> {
         match self {
             Self::Struct(fields) => {
                 let mut file = match builder.start_file(name, hash) {
                     Some(f) => f.lock().unwrap().clone(),
-                    None => return Some(name.to_string()),
+                    None => return Some(BuildTypeInfos {
+                        name: format!("{}{}", name, generics),
+                        imports: vec![name.to_owned()]
+                    })
                 };
 
                 let (name,_) = builder.get_type_and_import(name, hash, 0);
@@ -368,7 +404,7 @@ impl Type {
                     _ => ""
                 };
 
-                file.content += &format!("\n\nexport {} {} {}", decl, name, ending);
+                file.content += &format!("\n\nexport {} {} {}", decl, format!("{}{}", name, generics), ending);
 
                 let mut type_declarations = HashMap::new();
 
@@ -390,12 +426,30 @@ impl Type {
                     *guard = file.clone();
                 }
 
-                return Some(file.name.clone())
+                return Some(BuildTypeInfos {
+                    name: format!("{}{}", name, generics),
+                    imports: vec![name],
+                })
             },
+            Self::Generic(this, generics) => {
+                let mut this_result = registry.get_indexed(&this.id).build(builder, registry).expect("BASE type");
+
+                let generic_imports = generics
+                    .iter()
+                    .map(|g| registry.get_indexed(&g.id).build(builder, registry).into_iter().flat_map(|x| x.imports).collect::<Vec<String>>())
+                    .flatten();
+
+                this_result.imports.extend(generic_imports);
+
+                return Some(this_result)
+            }
             Self::Enum(repr, variants) => {
                 let mut file = match builder.start_file(name, hash) {
                     Some(f) => f.lock().unwrap().clone(),
-                    None => return Some(name.to_string()),
+                    None => return Some(BuildTypeInfos {
+                        name: format!("{}{}", name, generics),
+                        imports: vec![name.to_owned()]
+                    }),
                 };
 
                 let (name,_) = builder.get_type_and_import(name, hash, 0);
@@ -431,7 +485,7 @@ impl Type {
                     file.exports.push(name.to_string());
                 }
 
-                file.content += &format!("\n\nexport type {} = {}", name, all_variant_type_names.join(" | "));
+                file.content += &format!("\n\nexport type {} = {}", format!("{}{}", name, generics), all_variant_type_names.join(" | "));
 
                 file.exports.push(name.to_string());
 
@@ -445,7 +499,10 @@ impl Type {
                     *guard = file.clone();
                 }
 
-                return Some(file.name.clone())
+                return Some(BuildTypeInfos {
+                    name: format!("{}{}", name, generics),
+                    imports: vec![name]
+                })
             }
             Self::Array(arr) => {
                 let sub_comp = registry.get_indexed(&arr.id);
@@ -459,10 +516,10 @@ impl Type {
             Self::Any => {
                 return None
             },
-            _ => unimplemented!("Not implemented")
+            Self::None => {
+                panic!("Failed finding None")
+            }
         }
-
-        return None
     }
 }
 

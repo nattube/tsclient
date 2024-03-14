@@ -28,6 +28,7 @@ impl<T: TypescriptType + 'static, E: TypescriptType + 'static> TypescriptType fo
 
         let component = Component {
             name: format!("Result"),
+            generics: Self::generics(),
             typ: Type::Enum(
                 EnumRepresentation::Default, 
                 vec![(String::from("Ok"), InnerType::NewType(ok)), (String::from("Err"), InnerType::NewType(err))]
@@ -61,11 +62,65 @@ impl<T: TypescriptType + 'static, E: TypescriptType + 'static> TypescriptType fo
     }
 
     fn name() -> String {
-        format!("Option<{},{}>", T::name(), E::name())
+        format!("Result<{},{}>", T::name(), E::name())
     }
 
-    fn ts_name() -> String {
+    fn generics() -> String {
         String::from("Result")
+    }
+}
+
+#[allow(non_camel_case_types)]
+struct __TS_Option_Base__;
+
+impl TypescriptType for __TS_Option_Base__ {
+    fn get_definition(registry: &mut GlobalTypeRegistry) -> HasIndexed {
+        let type_id = TypeId::of::<Self>();
+        if let Some(existing) = registry.return_existing(type_id) {
+            return existing
+        }
+
+        registry.start(type_id);
+
+        let hash = Self::hash(registry); 
+
+        let component = Component {
+            name: format!("Option"),
+            generics: Self::generics(),
+            typ: Type::Enum(
+                    EnumRepresentation::Untagged, 
+                    vec![(String::from("Some"), InnerType::SimpleVariant(String::from("T"))), (String::from("None"), InnerType::Null)]
+                ),
+            hash
+        };
+
+        return registry.finalize(type_id, component)
+    }
+
+    fn hash(registry: &mut GlobalTypeRegistry) -> u64 {
+        let type_id = ::std::any::TypeId::of::<Self>();
+
+        if let Some(h) = registry.start_hash(type_id) {
+            return h
+        }
+
+        let mut hasher = DefaultHasher::new();
+        "enum".hash(&mut hasher);
+        Self::name().hash(&mut hasher);
+
+        let hash = hasher.finish();
+
+        registry.finalize_hash(type_id, hash);
+
+        return hash;
+    }
+
+    fn name() -> String {
+        format!("Option")
+    }
+ 
+    fn generics() -> String {
+        String::from("<T>")
     }
 }
 
@@ -83,13 +138,19 @@ impl<T: TypescriptType + 'static> TypescriptType for Option<T> {
             renamed: None,
         };
 
+        let base = ComponentReference {
+            id: __TS_Option_Base__::get_definition(registry),
+            renamed: None
+        };
+
         let hash = Self::hash(registry); 
 
         let component = Component {
             name: format!("Option"),
-            typ: Type::Enum(
-                EnumRepresentation::Untagged, 
-                vec![(String::from("Ok"), InnerType::NewType(some)), (String::from("None"), InnerType::Null)]
+            generics: Self::generics(),
+            typ: Type::Generic(
+                base, 
+                vec![some]
             ),
             hash
         };
@@ -121,8 +182,8 @@ impl<T: TypescriptType + 'static> TypescriptType for Option<T> {
        format!("Option")
     }
 
-    fn ts_name() -> String {
-        T::name() + " | null"
+    fn generics() -> String {
+        format!("<{}>", T::name())
     }
 }
 

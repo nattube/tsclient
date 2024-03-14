@@ -26,7 +26,7 @@ impl TypescriptType for Value {
        String::from("any")
     }
 
-    fn ts_name() -> String {
+    fn generics() -> String {
         String::from("any")
     }
 }
