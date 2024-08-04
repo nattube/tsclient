@@ -26,6 +26,7 @@ impl ClientObjectBuilder {
 
     pub(crate) fn get_ts_imports(&self) -> String {
         self.import_map.iter()
+            .sorted_by(|a,b| Ord::cmp(&a.0, &b.0))
             .map(|(path, name)| format!("import {{ {} }} from \"{}\";", name.join(", "), path))
             .collect::<Vec<_>>()
             .join("\n")
@@ -133,7 +134,7 @@ impl Api {
 
         builder.export_to(&dto_path)?;
 
-        for (path, route) in self.routes.iter() {
+        for (path, route) in self.routes.iter().sorted_by(|a,b| a.0.cmp(&b.0)) {
             
             let cleaned_path = match &remove_prefix {
                 Some(prefix) => match path.strip_prefix(prefix) {
@@ -448,7 +449,7 @@ export async function {method_base_name}({inputs}): {result} {{
 
 
 
-        let imports = imports.into_iter().map(|(_, x)| x).collect::<Vec<_>>().join("\n");
+        let imports = imports.into_iter().sorted().map(|(_, x)| x).collect::<Vec<_>>().join("\n");
 
 
         format!("{}\n{}\n\n {}", FILE_HEADER, imports, file_content.join("\n\n"))

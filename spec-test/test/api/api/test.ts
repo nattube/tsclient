@@ -4,11 +4,11 @@
  * WARNING: Changes you perform here will probably not persist!
 */
 
-import __client__, {type ApiResult} from "./client"
+import { type Option } from "../dto/Option";
 import { type Test } from "../dto/Test";
 import { type Test3 } from "../dto/Test3";
 import { type UserInfo } from "../dto/UserInfo";
-import { type Option } from "../dto/Option";
+import __client__, {type ApiResult} from "./client"
 
  
 export async function getTest_RAW(): Promise<Response> {

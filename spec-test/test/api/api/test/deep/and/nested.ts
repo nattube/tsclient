@@ -4,9 +4,9 @@
  * WARNING: Changes you perform here will probably not persist!
 */
 
+import { type Result } from "../../../../dto/Result";
 import { type Test } from "../../../../dto/Test";
 import { type Test3 } from "../../../../dto/Test3";
-import { type Result } from "../../../../dto/Result";
 import __client__, {type ApiResult} from "../../../client"
 
  

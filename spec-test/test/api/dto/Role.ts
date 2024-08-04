@@ -3,8 +3,8 @@
  * 
  * WARNING: Changes you perform here will probably not persist!
 */
-import {type Ability} from "./Ability";
 import {type Option} from "./Option";
+import {type Ability} from "./Ability";
 
 type String = string;
 type i32 = number;

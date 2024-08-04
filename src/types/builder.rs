@@ -1,5 +1,7 @@
 use std::{collections::{HashMap, HashSet}, any::TypeId, sync::Mutex, path::PathBuf, error::Error, fs};
 
+use itertools::Itertools;
+
 use crate::{Postion, FILE_HEADER};
 
 use super::model::{Component, Type};
@@ -29,7 +31,7 @@ impl TypeBuilder {
             fs::create_dir_all(&dto_path)?;
         }
 
-        for (name, file) in self.file_map.iter() {
+        for (name, file) in self.file_map.iter().sorted_by(|a,b| a.0.cmp(&b.0)) {
             let mut file_content = String::new();
             file_content += FILE_HEADER;
 
@@ -46,7 +48,7 @@ impl TypeBuilder {
                     file_content += &format!("import {{type {}{}}} from \"./{}\";\n", name, rename, name);
                 }
 
-                for def in file_guard.type_defs.iter() {
+                for def in file_guard.type_defs.iter().sorted() {
                     file_content += &format!("\n{}", def);
                 }
 

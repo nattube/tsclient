@@ -6,8 +6,8 @@
 import {type Role} from "./Role";
 import {type Option} from "./Option";
 
-type i32 = number;
 type String = string;
+type i32 = number;
 
 export type Group = {
 	id: i32;
