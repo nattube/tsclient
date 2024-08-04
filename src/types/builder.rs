@@ -39,7 +39,7 @@ impl TypeBuilder {
                 // Nasty but don't want to fight lifetimes atm.
                 let file_guard = file.lock().expect("Poisened");
 
-                for (name, renamed) in file_guard.imports.iter() {
+                for (name, renamed) in file_guard.imports.iter().sorted_by(|a,b| a.0.cmp(&b.0)) {
                     let rename = match renamed {
                         Some(x) => format!(" as {}", x),
                         None => String::from(""),

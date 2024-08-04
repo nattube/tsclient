@@ -3,8 +3,8 @@
  * 
  * WARNING: Changes you perform here will probably not persist!
 */
-import {type Role} from "./Role";
 import {type Option} from "./Option";
+import {type Role} from "./Role";
 
 type String = string;
 type i32 = number;
