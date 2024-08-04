@@ -143,6 +143,7 @@ pub enum InnerType {
     Tuple(Vec<ComponentReference>),
     NewType(ComponentReference),
     SimpleVariant(String),
+    UntypedCustomVariant(String),
     Null
 }
 
@@ -325,6 +326,15 @@ impl InnerType {
                     Some((EnumRepresentation::Adjacently(tag, _), typ)) => {
                         format!("{{\n\t{}: \"{}\";\n}}", tag, typ)
                     },
+                    _ => format!(r#""{}""#, x)
+                };
+                (format!(r#"{}"#, result), HashMap::new())
+            },
+            InnerType::UntypedCustomVariant(x) => {
+                let result = match repr {
+                    Some((EnumRepresentation::Adjacently(tag, _), typ)) => {
+                        format!("{{\n\t{}: \"{}\";\n}}", tag, typ)
+                    },
                     _ => format!(r#"{}"#, x)
                 };
                 (format!(r#"{}"#, result), HashMap::new())
@@ -341,6 +351,7 @@ impl InnerType {
             InnerType::Tuple(_) => "type",
             InnerType::NewType(_) => "type",
             InnerType::SimpleVariant(_) => "type",
+            InnerType::UntypedCustomVariant(_) => "type",
             InnerType::Null => "type",
         }
     }

@@ -24,7 +24,7 @@ impl TypescriptType for __TS_Result_Base__ {
             generics: Self::generics(),
             typ: Type::Enum(
                 EnumRepresentation::Default, 
-                vec![(String::from("Ok<T>"), InnerType::SimpleVariant("{ Ok: T }".into())), (String::from("Err<E>"), InnerType::SimpleVariant("{ Err: E }".into()))]
+                vec![(String::from("Ok<T>"), InnerType::UntypedCustomVariant("{ Ok: T }".into())), (String::from("Err<E>"), InnerType::UntypedCustomVariant("{ Err: E }".into()))]
                 ),
             hash: type_id
         };
@@ -148,7 +148,7 @@ impl TypescriptType for __TS_Option_Base__ {
             generics: Self::generics(),
             typ: Type::Enum(
                     EnumRepresentation::Untagged, 
-                    vec![(String::from("Some<T>"), InnerType::SimpleVariant(String::from("T"))), (String::from("None"), InnerType::Null)]
+                    vec![(String::from("Some<T>"), InnerType::UntypedCustomVariant(String::from("T"))), (String::from("None"), InnerType::Null)]
                 ),
             hash: type_id
         };

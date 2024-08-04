@@ -5,8 +5,8 @@
 */
 import {type Group} from "./Group";
 
-type String = string;
 type i32 = number;
+type String = string;
 type bool = boolean;
 
 export type UserInfo = {
