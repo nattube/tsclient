@@ -1,4 +1,4 @@
-use std::{collections::hash_map::DefaultHasher, hash::{Hasher as _, Hash as _}, collections::{HashMap, HashSet}};
+use std::{any::TypeId, collections::{hash_map::DefaultHasher, HashMap, HashSet}, hash::{Hash as _, Hasher as _}};
 
 use crate::Postion;
 
@@ -23,7 +23,7 @@ pub struct Component {
     pub name: String,
     pub generics: String,
     pub typ: Type,
-    pub hash: u64,
+    pub hash: TypeId,
 }
 
 impl Component {
@@ -35,7 +35,7 @@ impl Component {
             name: String::from("any"),
             generics: String::new(),
             typ: Type::Any,
-            hash: hasher.finish(),
+            hash: TypeId::of::<Self>(),
         }
     }
 
@@ -125,7 +125,7 @@ impl Component {
 
     pub fn build(&self, builder: &mut TypeBuilder, registry: &GlobalTypeRegistry) -> Option<BuildTypeInfos> {
         if self.name == "Result" {
-            println!("Result hash: {}!!!!", self.hash)
+            //println!("Result hash: {}!!!!", self.hash)
         }
         self.typ.build(&self.name, &self.generics, self.hash, builder, registry)
     }
@@ -381,7 +381,7 @@ impl Type {
         }
     }
 
-    pub fn build(&self, name: &str, generics: &str, hash: u64, builder: &mut TypeBuilder, registry: &GlobalTypeRegistry) -> Option<BuildTypeInfos> {
+    pub fn build(&self, name: &str, generics: &str, hash: TypeId, builder: &mut TypeBuilder, registry: &GlobalTypeRegistry) -> Option<BuildTypeInfos> {
         match self {
             Self::Struct(fields) => {
                 let mut file = match builder.start_file(name, hash) {

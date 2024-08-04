@@ -11,6 +11,7 @@ serde = {version = "1.0", features = ["derive"]}
 typescript = {path = "./macros/typescript" }
 once_cell = "1.19"
 regex = "1.10"
+itertools = "0.13"
 
 chrono = { version = "0.4", features = ["serde"] }
 serde_json = { version = "1.0"}

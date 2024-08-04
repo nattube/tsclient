@@ -45,7 +45,7 @@ macro_rules! ts_tuple {
                     typ: Type::Struct(
                         InnerType::Tuple(subs)
                     ),
-                    hash
+                    hash: type_id
                 };
             
                 return registry.finalize(type_id, component)

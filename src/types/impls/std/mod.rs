@@ -26,7 +26,7 @@ impl TypescriptType for __TS_Result_Base__ {
                 EnumRepresentation::Default, 
                 vec![(String::from("Ok<T>"), InnerType::SimpleVariant("{ Ok: T }".into())), (String::from("Err<E>"), InnerType::SimpleVariant("{ Err: E }".into()))]
                 ),
-            hash
+            hash: type_id
         };
 
         return registry.finalize(type_id, component)
@@ -92,7 +92,7 @@ impl<T: TypescriptType + 'static, E: TypescriptType + 'static> TypescriptType fo
                 base, 
                 vec![ok, err]
             ),
-            hash
+            hash: type_id
         };
 
         return registry.finalize(type_id, component)
@@ -150,7 +150,7 @@ impl TypescriptType for __TS_Option_Base__ {
                     EnumRepresentation::Untagged, 
                     vec![(String::from("Some<T>"), InnerType::SimpleVariant(String::from("T"))), (String::from("None"), InnerType::Null)]
                 ),
-            hash
+            hash: type_id
         };
 
         return registry.finalize(type_id, component)
@@ -211,7 +211,7 @@ impl<T: TypescriptType + 'static> TypescriptType for Option<T> {
                 base, 
                 vec![some]
             ),
-            hash
+            hash: type_id
         };
 
         return registry.finalize(type_id, component)

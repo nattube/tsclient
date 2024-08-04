@@ -39,7 +39,7 @@ impl<T> GetDefinition<T> for &TypeHolder<T> {
         String::from("any")
     }
     fn hash(self, registry: &mut GlobalTypeRegistry) -> u64 {
-        Component::any().hash
+        0
     }
 }
 

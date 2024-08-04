@@ -19,7 +19,7 @@ impl TypescriptType for Value {
     }
 
     fn hash(_registry: &mut GlobalTypeRegistry) -> u64 {
-        Component::any().hash
+        0
     }
 
     fn name() -> String {

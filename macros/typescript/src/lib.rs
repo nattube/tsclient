@@ -107,7 +107,7 @@ fn ts_internal(parse: syn::Data, generics: syn::Generics, ident: syn::Ident, att
                     name: #id_name.to_string(),
                     generics: #generics_type.to_string(),
                     typ,
-                    hash
+                    hash: type_id
                 };
 
                 return registry.finalize(type_id, component)

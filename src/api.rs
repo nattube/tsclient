@@ -1,6 +1,7 @@
 use std::{collections::HashMap, sync::Mutex, path::{PathBuf}, error::Error, fs, convert::Infallible};
 
 use axum::{http::method, routing::{MethodRouter, MethodFilter}, handler::Handler, body::HttpBody};
+use itertools::Itertools;
 use regex::Regex;
 
 use crate::{types::{builder::{GlobalTypeRegistry, TypeBuilder}, model::Component}, Postion, api_router::RouteComponentType, utils::{clean_var_name, capitalize_first_letter}, FILE_HEADER};
@@ -206,7 +207,7 @@ export type ApiResult<T, E> = {{ok: true, value: T}} | {{ok: false, status: numb
     }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Hash, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Copy, Clone)]
 pub enum HTTPMethod {
     GET,
     POST,
@@ -318,7 +319,7 @@ impl Route {
         
         imports.insert("__client__".to_owned(), format!("import __client__, {{type ApiResult}} from \"{}/client\"", client_imp));
 
-        for (http, method) in self.methods.iter() {
+        for (http, method) in self.methods.iter().sorted_by(|a,b| Ord::cmp(&a.0, &b.0)) {
             let mut route_inputs_builder = Vec::new();
             let mut route_inputs_names = Vec::new();
             let mut route_result_builder = String::from("void");

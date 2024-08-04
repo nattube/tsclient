@@ -30,7 +30,7 @@ pub fn boilerplate_simple_definition<T: TypescriptType + 'static>(typ: Type, reg
         name,
         generics,
         typ,
-        hash,
+        hash: type_id,
     })
 }
 

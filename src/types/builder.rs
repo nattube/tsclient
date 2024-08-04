@@ -7,14 +7,14 @@ use super::model::{Component, Type};
 #[derive(Debug)]
 pub struct TypeBuilder {
     pub file_map: HashMap::<String, Mutex<ComponentFileBuilder>>,
-    pub rename_map: HashMap::<u64, String>,
+    pub rename_map: HashMap::<TypeId, String>,
 }
 
 impl TypeBuilder {
     pub fn build(registry: &GlobalTypeRegistry) -> Self {
         let mut builder = Self {
             file_map: HashMap::<String, Mutex<ComponentFileBuilder>>::new(),
-            rename_map: HashMap::<u64, String>::new(),
+            rename_map: HashMap::<TypeId, String>::new(),
         };
 
         for comp in &registry.components {
@@ -60,7 +60,7 @@ impl TypeBuilder {
         Ok(())
     }
 
-    pub fn start_file(&mut self, name: &str, hash: u64) -> Option<&Mutex<ComponentFileBuilder>> {
+    pub fn start_file(&mut self, name: &str, hash: TypeId) -> Option<&Mutex<ComponentFileBuilder>> {
         let name = match self.rename_map.get(&hash) {
             Some(c) => c,
             None => name
@@ -91,7 +91,7 @@ impl TypeBuilder {
         return self.file_map.get(&name)
     }
 
-    pub fn get_type_and_import(&self, name: &str, hash: u64, level: usize) -> (String, String) {
+    pub fn get_type_and_import(&self, name: &str, hash: TypeId, level: usize) -> (String, String) {
         let name = match self.rename_map.get(&hash) {
             Some(c) => c,
             None => name
@@ -107,7 +107,7 @@ impl TypeBuilder {
         };
     }
 
-    pub fn get_file(&mut self, name: &str, hash: u64) -> Option<&Mutex<ComponentFileBuilder>> {
+    pub fn get_file(&mut self, name: &str, hash: TypeId) -> Option<&Mutex<ComponentFileBuilder>> {
         let name = match self.rename_map.get(&hash) {
             Some(c) => c,
             None => name
@@ -241,14 +241,10 @@ impl GlobalTypeRegistry {
 
         if let Some(i) = self.type_index.get(&type_id) {
             return HasIndexed::Build(*i);
-        } /*else if let Some(i) = self.hash_index.get(&hash) {
-            self.type_index.insert(type_id, *i);
-            return HasIndexed::Build(*i);
-        }*/
+        }
 
         self.components.push(component);
         self.type_index.insert(type_id, ind);
-        self.hash_index.insert(hash, ind);
 
         return HasIndexed::Build(ind);
     }
@@ -257,7 +253,7 @@ impl GlobalTypeRegistry {
 #[derive(Clone, Debug)]
 pub struct ComponentFileBuilder {
     pub name: String,
-    pub hash: u64,
+    pub hash: TypeId,
     pub imports: Vec<(String, Option<String>)>,
     pub type_defs: HashSet<String>,
     pub content: String,
@@ -265,7 +261,7 @@ pub struct ComponentFileBuilder {
 }
 
 impl ComponentFileBuilder {
-    pub fn new(name: String, hash: u64) -> Self {
+    pub fn new(name: String, hash: TypeId) -> Self {
         Self {
             name,
             hash,

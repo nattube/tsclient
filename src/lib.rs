@@ -75,7 +75,7 @@ impl TypescriptType for T1 {
             name: String::from("T1"),
             generics: Self::generics(),
             typ: Type::SimpleType(String::from("T1")),
-            hash,
+            hash: TypeId::of::<Self>(),
         })
     }
     fn name() -> String {
