@@ -3,11 +3,10 @@
  * 
  * WARNING: Changes you perform here will probably not persist!
 */
-import {type Abilities} from "./Abilities";
 
-type i32 = number;
+type u64 = number;
 
-export type Ability = {
-	id: i32;
-	name: Abilities
+export type Test2A = {
+	field1: u64;
+	field2: u64
 }

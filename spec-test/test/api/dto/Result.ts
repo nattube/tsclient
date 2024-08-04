@@ -5,14 +5,10 @@
 */
 
 
-export type Ok = {
-	Ok: number
-}
+export type Ok<T> = { Ok: T }
 
 
-export type Err = {
-	Err: string
-}
+export type Err<E> = { Err: E }
 
 
-export type ResultResult = Ok | Err
+export type Result<T, E> = Ok<T> | Err<E>

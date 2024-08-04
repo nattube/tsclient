@@ -3,13 +3,15 @@
  * 
  * WARNING: Changes you perform here will probably not persist!
 */
-import {type Role} from "./Role";
 import {type Option} from "./Option";
+import {type Role} from "./Role";
 
+type String = string;
+type i32 = number;
 
 export type Group = {
-	id: number;
-	name: string;
+	id: i32;
+	name: String;
 	roles: Array<Role>;
-	meta_data: Option
+	meta_data: Option<any>
 }

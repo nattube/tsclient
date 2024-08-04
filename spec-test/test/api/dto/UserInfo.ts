@@ -5,11 +5,14 @@
 */
 import {type Group} from "./Group";
 
+type i32 = number;
+type String = string;
+type bool = boolean;
 
 export type UserInfo = {
-	id: number;
-	name: string;
-	refresh_pw: boolean;
+	id: i32;
+	name: String;
+	refresh_pw: bool;
 	groups: Array<Group>;
-	security_version: number
+	security_version: i32
 }

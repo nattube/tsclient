@@ -4,9 +4,11 @@
  * WARNING: Changes you perform here will probably not persist!
 */
 import {type Result} from "./Result";
+import {type Test2A} from "./Test2A";
 
+type u64 = number;
 
 export type Test2 = {
-	field1: Result;
-	field2: number
+	field1: Result<Test2A,string>;
+	field2: u64
 }

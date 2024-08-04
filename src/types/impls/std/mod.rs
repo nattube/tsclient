@@ -5,6 +5,60 @@ use crate::types::{builder::{GlobalTypeRegistry, HasIndexed}, TypescriptType, mo
 
 use super::{boilerplate_simple_definition, boilerplate_simple_hash, ts_simple, ts_array, ts_tuple};
 
+#[allow(non_camel_case_types)]
+struct __TS_Result_Base__;
+
+impl TypescriptType for __TS_Result_Base__ {
+    fn get_definition(registry: &mut GlobalTypeRegistry) -> HasIndexed {
+        let type_id = TypeId::of::<Self>();
+        if let Some(existing) = registry.return_existing(type_id) {
+            return existing
+        }
+
+        registry.start(type_id);
+
+        let hash = Self::hash(registry); 
+
+        let component = Component {
+            name: format!("Result"),
+            generics: Self::generics(),
+            typ: Type::Enum(
+                EnumRepresentation::Default, 
+                vec![(String::from("Ok<T>"), InnerType::SimpleVariant("{ Ok: T }".into())), (String::from("Err<E>"), InnerType::SimpleVariant("{ Err: E }".into()))]
+                ),
+            hash
+        };
+
+        return registry.finalize(type_id, component)
+    }
+
+    fn hash(registry: &mut GlobalTypeRegistry) -> u64 {
+        let type_id = ::std::any::TypeId::of::<Self>();
+
+        if let Some(h) = registry.start_hash(type_id) {
+            return h
+        }
+
+        let mut hasher = DefaultHasher::new();
+        "enum".hash(&mut hasher);
+        Self::name().hash(&mut hasher);
+
+        let hash = hasher.finish();
+
+        registry.finalize_hash(type_id, hash);
+
+        return hash;
+    }
+
+    fn name() -> String {
+        format!("Result")
+    }
+ 
+    fn generics() -> String {
+        String::from("<T, E>")
+    }
+}
+
 impl<T: TypescriptType + 'static, E: TypescriptType + 'static> TypescriptType for Result<T, E> {
     fn get_definition(registry: &mut GlobalTypeRegistry) -> HasIndexed {
         let type_id = TypeId::of::<Self>();
@@ -24,14 +78,19 @@ impl<T: TypescriptType + 'static, E: TypescriptType + 'static> TypescriptType fo
             renamed: None,
         };
 
+        let base = ComponentReference {
+            id: __TS_Result_Base__::get_definition(registry),
+            renamed: None
+        };
+
         let hash = Self::hash(registry); 
 
         let component = Component {
-            name: format!("Result"),
+            name: format!("Result{}", Self::generics()),
             generics: Self::generics(),
-            typ: Type::Enum(
-                EnumRepresentation::Default, 
-                vec![(String::from("Ok"), InnerType::NewType(ok)), (String::from("Err"), InnerType::NewType(err))]
+            typ: Type::Generic(
+                base, 
+                vec![ok, err]
             ),
             hash
         };
@@ -62,11 +121,11 @@ impl<T: TypescriptType + 'static, E: TypescriptType + 'static> TypescriptType fo
     }
 
     fn name() -> String {
-        format!("Result<{},{}>", T::name(), E::name())
+        format!("Result")
     }
 
     fn generics() -> String {
-        String::from("Result")
+        format!("<{},{}>", T::name(), E::name())
     }
 }
 
@@ -89,7 +148,7 @@ impl TypescriptType for __TS_Option_Base__ {
             generics: Self::generics(),
             typ: Type::Enum(
                     EnumRepresentation::Untagged, 
-                    vec![(String::from("Some"), InnerType::SimpleVariant(String::from("T"))), (String::from("None"), InnerType::Null)]
+                    vec![(String::from("Some<T>"), InnerType::SimpleVariant(String::from("T"))), (String::from("None"), InnerType::Null)]
                 ),
             hash
         };
@@ -146,7 +205,7 @@ impl<T: TypescriptType + 'static> TypescriptType for Option<T> {
         let hash = Self::hash(registry); 
 
         let component = Component {
-            name: format!("Option"),
+            name: format!("Option{}", Self::generics()),
             generics: Self::generics(),
             typ: Type::Generic(
                 base, 

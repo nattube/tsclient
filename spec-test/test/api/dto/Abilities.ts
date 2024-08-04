@@ -4,9 +4,9 @@
  * WARNING: Changes you perform here will probably not persist!
 */
 
-type GroupId = number;
-type LocationId = number;
 type EventTypeId = number;
+type LocationId = number;
+type GroupId = number;
 
 export type ManageCalendar = {
 	type: "ManageCalendar";

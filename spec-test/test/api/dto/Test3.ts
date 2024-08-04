@@ -9,7 +9,7 @@ import {type Test} from "./Test";
 
 export type Test3 = {
 	field1: Array<string>;
-	field2: Option;
-	field3: Option;
-	field4: Option
+	field2: Option<number>;
+	field3: Option<number>;
+	field4: Option<Test>
 }

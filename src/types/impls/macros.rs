@@ -5,7 +5,7 @@ macro_rules! ts_simple {
                 boilerplate_simple_definition::<$typ>(crate::types::model::Type::SimpleType(String::from($ts_typ)), registry)
             }
             fn name() -> String {
-                String::from($typ_name)
+                String::from($ts_typ)
             }
             fn generics() -> String {
                 String::from($ts_typ)

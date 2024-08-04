@@ -5,10 +5,10 @@
 */
 
 
-export type Some = T
+export type Some<T> = T
 
 
 export type None = null
 
 
-export type Option<T> = Some | None
+export type Option<T> = Some<T> | None

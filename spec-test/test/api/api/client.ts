@@ -4,7 +4,7 @@
  * WARNING: Changes you perform here will probably not persist!
 */
 
-import { getTest, postTest } from "./test";
+import { postTest, getTest } from "./test";
 import { createNested } from "./test/deep/and/nested";
 
 class Client {
@@ -12,15 +12,15 @@ class Client {
 
     API = {
 		test: {
+			postTest: postTest,
+			getTest: getTest,
 			deep: {
 				and: {
 					nested: {
 						createNested: createNested
 					}
 				}
-			},
-			getTest: getTest,
-			postTest: postTest
+			}
 		}
 	}
 

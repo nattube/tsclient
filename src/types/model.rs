@@ -119,7 +119,8 @@ impl Component {
                 //    .collect::<Vec<String>>().join(", ");
                 //
                 //format!("{}<{}>", self.name, generics)
-                registry.get_indexed(&this.id).get_ts_name(registry)
+                format!("{}", self.name)
+                //registry.get_indexed(&this.id).get_ts_name(registry)
             }
             Type::SimpleType(x) => x.clone(),
             Type::Any => String::from("any"),
@@ -431,15 +432,16 @@ impl Type {
                     imports: vec![name],
                 })
             },
-            Self::Generic(this, generics) => {
+            Self::Generic(this, gens) => {
                 let mut this_result = registry.get_indexed(&this.id).build(builder, registry).expect("BASE type");
 
-                let generic_imports = generics
+                let generic_imports = gens
                     .iter()
                     .map(|g| registry.get_indexed(&g.id).build(builder, registry).into_iter().flat_map(|x| x.imports).collect::<Vec<String>>())
                     .flatten();
 
                 this_result.imports.extend(generic_imports);
+                this_result.name = format!("{}{}", name, generics);
 
                 return Some(this_result)
             }

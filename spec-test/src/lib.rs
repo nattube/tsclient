@@ -40,7 +40,7 @@ mod tests {
     
     #[derive(Serialize, Deserialize, TypeScript)]
     pub struct Test2 {
-        field1: Result<u64, String>,
+        field1: Result<Test2A, String>,
         field2: u64
     }
 
@@ -125,7 +125,7 @@ mod tests {
             field3: Some(1),
             field4: Some(Test {
                 field1: vec![String::from("String 2")],
-                field2: vec![Test2 { field1: Ok(2), field2: 3 }, Test2 { field1: Err(String::from("erorr string")), field2: 3 }],
+                field2: vec![Test2 { field1: Ok(Test2A {field1: 1, field2: 2}), field2: 3 }, Test2 { field1: Err(String::from("erorr string")), field2: 3 }],
             }),
         };
 

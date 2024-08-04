@@ -5,6 +5,7 @@
 */
 
 import { type Test3 } from "../../../../dto/Test3";
+import { type Result } from "../../../../dto/Result";
 import __client__, {type ApiResult} from "../../../client"
 import { type Test } from "../../../../dto/Test";
 
@@ -38,7 +39,7 @@ export async function createNested_RAW(test3: Test3, test: Test): Promise<Respon
 
 
 
-export async function createNested(test3: Test3, test: Test): Promise<ApiResult<Array<Test>, string>> {
+export async function createNested(test3: Test3, test: Test): Promise<ApiResult<Result<Vec,string>, any>> {
     let __result = await createNested_RAW(test3, test);
 
     if(!__result.ok) {

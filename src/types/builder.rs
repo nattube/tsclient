@@ -1,8 +1,8 @@
 use std::{collections::{HashMap, HashSet}, any::TypeId, sync::Mutex, path::PathBuf, error::Error, fs};
 
-use crate::FILE_HEADER;
+use crate::{Postion, FILE_HEADER};
 
-use super::model::Component;
+use super::model::{Component, Type};
 
 #[derive(Debug)]
 pub struct TypeBuilder {
@@ -137,6 +137,28 @@ pub enum HasIndexed {
     Prebuild(TypeId),
     Build(usize)
 }
+
+/*
+#[derive(Default, Debug)]
+pub struct OuterTypeRegistry {
+    current_prefix: Option<(string, string)>,
+    type_registry: GlobalTypeRegistry,
+    registered: HashMap<TypeId, (Option<(string, string)>, fn(&mut GlobalTypeRegistry, Postion) -> Component)>
+}
+
+impl OuterTypeRegistry {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn reset(&mut self) {
+        self.current_prefix = None;
+        self.type_registry.reset();
+        self.registered = HashMap::new();
+    }
+}
+
+ */
 
 #[derive(Default, Debug)]
 pub struct GlobalTypeRegistry {
