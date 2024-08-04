@@ -68,7 +68,7 @@ mod tests {
     //    Groups(Test2)
     //}
     
-    async fn test_fn(q: Query<Test3>, Json(body): Json<Test>) -> Json<Test> {
+    async fn test_fn(q: Query<Option<Test3>>, Json(body): Json<Test>) -> Json<Test> {
         Json(body)
     }
 

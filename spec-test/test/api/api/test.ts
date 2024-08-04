@@ -4,13 +4,14 @@
  * WARNING: Changes you perform here will probably not persist!
 */
 
-import { type Test } from "../dto/Test";
-import { type UserInfo } from "../dto/UserInfo";
+import { type Option } from "../dto/Option";
 import { type Test3 } from "../dto/Test3";
 import __client__, {type ApiResult} from "./client"
+import { type UserInfo } from "../dto/UserInfo";
+import { type Test } from "../dto/Test";
 
  
-export async function postTest_RAW(test3: Test3, test: Test): Promise<Response> {
+export async function postTest_RAW(optionOfTest3: Option<Test3>, test: Test): Promise<Response> {
     const headers = new Headers({
         'Content-Type': 'application/json'
     });
@@ -20,10 +21,7 @@ export async function postTest_RAW(test3: Test3, test: Test): Promise<Response> 
     
     const __params = new URLSearchParams();
 
-	if(test3?.field1 != null) { test3.field1.forEach(val => __params.append('field1', val.toString())); }
-	if(test3?.field2 != null) { __params.append('field2', test3.field2.toString()) }
-	if(test3?.field3 != null) { __params.append('field3', test3.field3.toString()) }
-	if(test3?.field4 != null) { __params.append('field4', test3.field4.toString()) }
+
 
     const __queryString = "?" + __params.toString();
 
@@ -39,8 +37,8 @@ export async function postTest_RAW(test3: Test3, test: Test): Promise<Response> 
 
 
 
-export async function postTest(test3: Test3, test: Test): Promise<ApiResult<Test, any>> {
-    let __result = await postTest_RAW(test3, test);
+export async function postTest(optionOfTest3: Option<Test3>, test: Test): Promise<ApiResult<Test, any>> {
+    let __result = await postTest_RAW(optionOfTest3, test);
 
     if(!__result.ok) {
         let error = await __result.json();

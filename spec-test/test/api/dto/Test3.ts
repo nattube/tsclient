@@ -3,8 +3,8 @@
  * 
  * WARNING: Changes you perform here will probably not persist!
 */
-import {type Option} from "./Option";
 import {type Test} from "./Test";
+import {type Option} from "./Option";
 
 
 export type Test3 = {
