@@ -2,7 +2,7 @@ use std::{collections::hash_map::DefaultHasher, hash::{Hasher as _, Hash as _}, 
 
 use crate::Postion;
 
-use super::builder::{HasIndexed, TypeBuilder, GlobalTypeRegistry};
+use super::{builder::{GlobalTypeRegistry, HasIndexed, TypeBuilder}, impls::std::__TS_Result_Base__};
 
 /// Flow:
 /// Check TypeId existence
@@ -90,16 +90,11 @@ impl Component {
 
     pub fn get_client_result(&self, registry: &GlobalTypeRegistry) -> String {
         match &self.typ {
-            Type::Enum(_, vals) => {
-                if vals.len() == 2 && vals[0].0 == "Ok" && vals[1].0 == "Err" {
-                    if let (InnerType::NewType(ok), InnerType::NewType(err)) = (&vals[0].1, &vals[1].1) {
-                        let ok = ok.renamed.as_ref().map(Clone::clone).unwrap_or(registry.get_indexed(&ok.id).get_ts_name(registry));
-                        let err = err.renamed.as_ref().map(Clone::clone).unwrap_or(registry.get_indexed(&err.id).get_ts_name(registry));
-                        format!("ApiResult<{}, {}>", ok, err)
-                    } else {
-                        format!("ApiResult<{}, any>", self.get_ts_name(registry))
-                    }
-                    
+            Type::Generic(o, vals) => {
+                if vals.len() == 2 && registry.get_indexed(&o.id).name == "Result" {
+                    let ok = vals[0].renamed.as_ref().map(Clone::clone).unwrap_or(registry.get_indexed(&vals[0].id).get_ts_name(registry));
+                    let err = vals[1].renamed.as_ref().map(Clone::clone).unwrap_or(registry.get_indexed(&vals[1].id).get_ts_name(registry));
+                    format!("ApiResult<{}, {}>", ok, err)
                 } else {
                     format!("ApiResult<{}, any>", self.get_ts_name(registry))
                 }

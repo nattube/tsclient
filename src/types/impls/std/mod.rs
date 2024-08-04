@@ -6,7 +6,7 @@ use crate::types::{builder::{GlobalTypeRegistry, HasIndexed}, TypescriptType, mo
 use super::{boilerplate_simple_definition, boilerplate_simple_hash, ts_simple, ts_array, ts_tuple};
 
 #[allow(non_camel_case_types)]
-struct __TS_Result_Base__;
+pub struct __TS_Result_Base__;
 
 impl TypescriptType for __TS_Result_Base__ {
     fn get_definition(registry: &mut GlobalTypeRegistry) -> HasIndexed {

@@ -3,8 +3,8 @@
  * 
  * WARNING: Changes you perform here will probably not persist!
 */
-import {type Test2A} from "./Test2A";
 import {type Result} from "./Result";
+import {type Test2A} from "./Test2A";
 
 type u64 = number;
 

@@ -5,9 +5,9 @@
 */
 import {type Group} from "./Group";
 
-type bool = boolean;
-type i32 = number;
 type String = string;
+type i32 = number;
+type bool = boolean;
 
 export type UserInfo = {
 	id: i32;

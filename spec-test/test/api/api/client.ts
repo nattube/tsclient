@@ -12,7 +12,6 @@ class Client {
 
     API = {
 		test: {
-			postTest: postTest,
 			getTest: getTest,
 			deep: {
 				and: {
@@ -20,7 +19,8 @@ class Client {
 						createNested: createNested
 					}
 				}
-			}
+			},
+			postTest: postTest
 		}
 	}
 
